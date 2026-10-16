@@ -1,0 +1,21 @@
+/* Classic palette: https://github.com/JetBrains/colorSchemeTool/blob/master/intellijThemes/Github.icls
+   Public appearance API v1. The fixed palette also colors the theme card preview. */
+[data-theme-part="app"][data-theme-api="1"] {
+    color-scheme: light;
+    --accent: #795da3;
+    --accent-ink: #ffffff;
+    --bg: #f5f5f5;
+    --panel: #ffffff;
+    --panel-alt: #f7f7f7;
+    --input: #ffffff;
+    --text: #333333;
+    --muted: #666666;
+    --faint: #767876;
+    --line: #e0e0e0;
+    --hover: #eeeeee;
+    --canvas: #ffffff;
+    --active: #b0cde7;
+    --shadow: 0 16px 70px #3332;
+    --texture: #969896;
+    --theme-font: "Segoe UI", Inter, system-ui, sans-serif;
+}

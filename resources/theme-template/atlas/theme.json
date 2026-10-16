@@ -1,0 +1,20 @@
+{
+  "format": "maploom/theme",
+  "api_version": 1,
+  "name": "Atlas",
+  "description": "A cartographer's desk with copper accents and a TSX compass. Картографический атлас.",
+  "variants": [
+    {
+      "id": "dark",
+      "name": "Atlas Dark",
+      "mode": "dark"
+    },
+    {
+      "id": "light",
+      "name": "Atlas Light",
+      "mode": "light"
+    }
+  ],
+  "stylesheet": "style.css",
+  "entry": "theme.tsx"
+}

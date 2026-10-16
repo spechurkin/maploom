@@ -1,0 +1,8 @@
+{
+  "format": "maploom/theme",
+  "api_version": 1,
+  "name": "Monokai",
+  "mode": "dark",
+  "description": "Dark CSS template based on the classic JetBrains Monokai color scheme.",
+  "stylesheet": "style.css"
+}

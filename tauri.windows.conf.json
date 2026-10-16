@@ -1,0 +1,27 @@
+{
+  "bundle": {
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "windows": {
+      "nsis": {
+        "installerHooks": "resources/installers/themes.nsh",
+        "languages": [
+          "English",
+          "Russian"
+        ],
+        "displayLanguageSelector": true,
+        "installMode": "currentUser"
+      },
+      "wix": {
+        "fragmentPaths": [
+          "resources/installers/themes.wxs"
+        ],
+        "componentRefs": [
+          "MaploomThemesDirectory"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+/* CSS provides a complete, script-free card preview. TSX adds adaptive accents
+   and a welcome-screen decoration using only the public appearance API. */
+[data-theme-part="app"][data-theme-mode="dark"] {
+    color-scheme: dark;
+    --accent: #d3a16b;
+    --accent-ink: #111d22;
+    --bg: #111d22;
+    --panel: #1a2a2e;
+    --panel-alt: #203237;
+    --input: #142328;
+    --text: #eee5d5;
+    --muted: #b2b9ae;
+    --faint: #86978f;
+    --line: #34494b;
+    --hover: #2b3f42;
+    --canvas: #101b20;
+    --active: #374038;
+    --shadow: 0 18px 72px #070e12aa;
+    --texture: #87978c;
+    --theme-font: "Segoe UI", Inter, system-ui, sans-serif;
+}
+
+[data-theme-part="app"][data-theme-mode="light"] {
+    color-scheme: light;
+    --accent: #804f2d;
+    --accent-ink: #ffffff;
+    --bg: #ede5d6;
+    --panel: #fffaf1;
+    --panel-alt: #f5edde;
+    --input: #fffdf7;
+    --text: #263b3d;
+    --muted: #63716b;
+    --faint: #7b8174;
+    --line: #d6ccb9;
+    --hover: #e9dfcc;
+    --canvas: #e6dece;
+    --active: #e9dfd2;
+    --shadow: 0 18px 72px #41372226;
+    --texture: #948571;
+}
+
+[data-theme-part="welcome"] {
+    background-image: radial-gradient(ellipse at 85% 90%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 48%),
+    repeating-linear-gradient(0deg, transparent, transparent 31px, color-mix(in srgb, var(--texture) 6%, transparent) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, color-mix(in srgb, var(--texture) 6%, transparent) 32px);
+}
+
+[data-theme-part="header"] {
+    border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+    background-image: linear-gradient(100deg, transparent 55%, color-mix(in srgb, var(--accent) 6%, transparent));
+}
+
+[data-theme-part="tools"], [data-theme-part="library"] {
+    background-image: linear-gradient(160deg, color-mix(in srgb, var(--accent) 3%, transparent), transparent 45%);
+}
+
+[data-theme-part="dialog"] {
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--line));
+    box-shadow: var(--shadow);
+}

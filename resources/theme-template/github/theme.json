@@ -1,0 +1,8 @@
+{
+  "format": "maploom/theme",
+  "api_version": 1,
+  "name": "GitHub",
+  "mode": "light",
+  "description": "Light CSS template based on the classic JetBrains GitHub color scheme.",
+  "stylesheet": "style.css"
+}

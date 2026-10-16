@@ -1,0 +1,17 @@
+{
+  "bundle": {
+    "linux": {
+      "deb": {
+        "postInstallScript": "resources/installers/themes-postinstall.sh"
+      },
+      "rpm": {
+        "postInstallScript": "resources/installers/themes-postinstall.sh"
+      }
+    },
+    "targets": [
+      "deb",
+      "rpm",
+      "appimage"
+    ]
+  }
+}

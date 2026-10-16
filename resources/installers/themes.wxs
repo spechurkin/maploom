@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?if $(sys.BUILDARCH)="x86"?>
+    <?define MaploomThemeWin64="no" ?>
+  <?else?>
+    <?define MaploomThemeWin64="yes" ?>
+  <?endif?>
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Directory Id="MaploomThemes" Name="themes">
+        <!-- Only the empty directory is managed. No user file is ever an MSI File. -->
+        <Component Id="MaploomThemesDirectory" Guid="9FEE977F-4609-4A95-8692-6960287EB1F9" Win64="$(var.MaploomThemeWin64)" Permanent="yes" NeverOverwrite="yes">
+          <CreateFolder />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+</Wix>

@@ -1,0 +1,21 @@
+/* Classic palette: https://github.com/JetBrains/colorSchemeTool/blob/master/intellijThemes/Monokai.icls
+   Public appearance API v1. The fixed palette also colors the theme card preview. */
+[data-theme-part="app"][data-theme-api="1"] {
+    color-scheme: dark;
+    --accent: #a6e22e;
+    --accent-ink: #272822;
+    --bg: #272822;
+    --panel: #30312b;
+    --panel-alt: #34352e;
+    --input: #272822;
+    --text: #f8f8f2;
+    --muted: #b6b3a2;
+    --faint: #90907f;
+    --line: #464741;
+    --hover: #3e3d32;
+    --canvas: #272822;
+    --active: #3e4a2a;
+    --shadow: 0 16px 70px #0006;
+    --texture: #75715e;
+    --theme-font: "Segoe UI", Inter, system-ui, sans-serif;
+}

@@ -1,0 +1,7 @@
+{
+  "format": "maploom/theme",
+  "api_version": 1,
+  "name": "Contour",
+  "mode": "light",
+  "stylesheet": "style.css"
+}

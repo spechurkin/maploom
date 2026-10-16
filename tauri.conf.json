@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Maploom",
+  "version": "package.json",
+  "identifier": "app.maploom.studio",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build:frontend",
+    "frontendDist": "frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Maploom · Map Studio",
+        "width": 1600,
+        "height": 1000,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "backgroundColor": "#101218",
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; img-src 'self' data: blob: maploom-theme: http://maploom-theme.localhost; font-src 'self' data: maploom-theme: http://maploom-theme.localhost; style-src 'self' 'unsafe-inline' maploom-theme: http://maploom-theme.localhost; script-src 'self' blob: 'sha256-OUbNeRr7knB1Ry5E+KHYhUQJQx6msnFVFOLmsUip0ro='; object-src 'none'; frame-src 'self' blob:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "useLocalToolsDir": true,
+    "targets": "all",
+    "category": "GraphicsAndDesign",
+    "shortDescription": "Map studio for virtual tabletops",
+    "icon": [
+      "assets/branding/maploom-icon.png",
+      "assets/branding/maploom.icns",
+      "assets/branding/maploom.ico"
+    ],
+    "resources": [
+      "locales/",
+      "resources/defaults.mloom_fabric"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRFN0RFMjNGRjk5RjcxNkUKUldSdWNaLzVQK0o5VGdyaFdTanJHbm4zNFpaU2F2WFdxUTZaZjhKZm8xWURxNTJCVHdHUEhaSEIK",
+      "endpoints": [
+        "https://github.com/spechurkin/maploom/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

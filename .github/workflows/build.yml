@@ -1,0 +1,147 @@
+name: Maploom build and release
+
+on:
+  push:
+    tags: [ '[0-9]*' ]
+  workflow_dispatch:
+
+concurrency:
+  group: maploom-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate signing setup
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo '::error::Set the TAURI_SIGNING_PRIVATE_KEY repository secret before running the release workflow.'
+            exit 1
+          fi
+      - id: source
+        run: echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - id: version
+        run: node scripts/check-release-version.mjs
+
+  build:
+    needs: version
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - name: windows-x86
+            os: windows-latest
+            target: i686-pc-windows-msvc
+          - name: macos-x64
+            os: macos-15-intel
+            target: x86_64-apple-darwin
+          - name: macos-arm64
+            os: macos-15
+            target: aarch64-apple-darwin
+          - name: linux-x64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - name: linux-arm64
+            os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+    env:
+      CARGO_TARGET_DIR: artifacts/build
+      CARGO_INCREMENTAL: '0'
+      APPIMAGE_EXTRACT_AND_RUN: '1'
+      NO_STRIP: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf rpm libssl-dev
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: '. -> artifacts/build'
+          key: ${{ matrix.name }}
+      - run: npm ci
+      - run: npm test
+      - name: Build and verify packages
+        run: node scripts/build-release.mjs ${{ matrix.name }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Verify CLI starts
+        if: runner.os != 'Windows'
+        run: artifacts/build/${{ matrix.target }}/release/maploom --help
+      - name: Verify Linux theme package lifecycle
+        if: runner.os == 'Linux'
+        run: sudo --preserve-env=GITHUB_ACTIONS node scripts/check-theme-packages.mjs dist/${{ matrix.name }}
+      - name: Verify Windows theme package lifecycle
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/check-theme-windows.ps1 -PackageDirectory dist/${{ matrix.name }}
+      - name: Verify macOS theme package lifecycle
+        if: runner.os == 'macOS'
+        run: node scripts/check-theme-packages.mjs dist/${{ matrix.name }}
+      - name: Upload installers, portable archives and checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: Maploom-${{ matrix.name }}
+          path: dist/${{ matrix.name }}/
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    needs: [ version, build ]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Maploom-*
+          path: artifacts/github-downloads
+      - name: Verify all six builds and assemble release
+        run: node scripts/prepare-github-release.mjs
+      - name: Publish tagged release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.version }}
+          target_commitish: ${{ needs.version.outputs.ref }}
+          name: Maploom ${{ needs.version.outputs.version }}
+          prerelease: ${{ needs.version.outputs.prerelease == 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/github-release/*

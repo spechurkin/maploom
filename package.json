@@ -1,0 +1,47 @@
+{
+  "name": "maploom",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:version": "node scripts/app-version.mjs",
+    "postinstall": "node scripts/app-version.mjs",
+    "version": "node scripts/app-version.mjs",
+    "predev": "node scripts/app-version.mjs",
+    "prebuild:frontend": "node scripts/app-version.mjs",
+    "prebuild": "node scripts/app-version.mjs",
+    "prebuild:binary": "node scripts/app-version.mjs",
+    "predesktop": "node scripts/app-version.mjs",
+    "install:proj": "npm install",
+    "dev": "vite --host 127.0.0.1 --port 1420 --strictPort",
+    "build:frontend": "tsc --noEmit && vite build",
+    "build": "tauri build -- --locked",
+    "build:binary": "tauri build --no-bundle -- --locked",
+    "build:release": "node scripts/build-release.mjs",
+    "build:windows:x64": "node scripts/build-release.mjs windows-x64",
+    "build:windows:x86": "node scripts/build-release.mjs windows-x86",
+    "build:macos:x64": "node scripts/build-release.mjs macos-x64",
+    "build:macos:arm64": "node scripts/build-release.mjs macos-arm64",
+    "build:linux:x64": "node scripts/build-release.mjs linux-x64",
+    "build:linux:arm64": "node scripts/build-release.mjs linux-arm64",
+    "desktop": "tauri dev",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test frontend/tests/*.test.ts"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.11.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.0",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0"
+  }
+}

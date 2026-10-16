@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Private updater signing material (public key lives in tauri.conf.json)
+/.secrets/
+*.key
+
+# Build output, generated Tauri schemas, and local verification output
+/target/
+/dist/
+/frontend/dist/
+/gen/
+/themes/
+/artifacts/
+/test-results/
+/playwright-report/
+/blob-report/
+*.tsbuildinfo
+
+# Local IDE settings and temporary files
+/.idea/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
