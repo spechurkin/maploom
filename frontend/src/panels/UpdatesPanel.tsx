@@ -2,6 +2,7 @@ import {AlertCircle, CheckCheck, Download, ExternalLink, LoaderCircle, RefreshCw
 import {version} from "../../../package.json";
 import {desktop} from "../app/bridge";
 import type {useUpdates} from "../app/useUpdates";
+import {UPDATE_PERIODS, updatePeriod} from "../app/updateSchedule";
 
 type Props = {
     appName?: string;
@@ -29,6 +30,12 @@ export function UpdatesPanel({updates: u, t, dirty, busy, onInstall, appName = "
                     : u.info?.status === "unpublished" ? "Update try later" : "Update automatic hint")}</p>
             </div>
         </div>
+        <label className="field">
+            <span>{t("Update check period")}</span>
+            <select value={u.period} disabled={!desktop} onChange={e => u.changePeriod(updatePeriod(e.target.value))}>
+                {UPDATE_PERIODS.map(period => <option key={period} value={period}>{t(`Update period ${period}`)}</option>)}
+            </select>
+        </label>
         {available && !u.error && u.info?.notes && <details className="update-release-notes">
             <summary>{t("Update what is new")}</summary>
             <p className="update-notes">{u.info.notes}</p>

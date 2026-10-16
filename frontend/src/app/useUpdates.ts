@@ -1,8 +1,14 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {desktop} from "./bridge";
 import {checkUpdate, installUpdate, openUpdateRelease, type UpdateInfo, type UpdateProgress} from "./updates";
+import {
+    readLastUpdateCheck, readUpdatePeriod, saveLastUpdateCheck, saveUpdatePeriod,
+    scheduleUpdateChecks, updatePeriod, type UpdatePeriod
+} from "./updateSchedule";
 
 export function useUpdates() {
+    const [period, setPeriod] = useState(readUpdatePeriod);
+    const lastCheck = useRef(readLastUpdateCheck());
     const [info, setInfo] = useState<UpdateInfo | null>(null);
     const [checking, setChecking] = useState(false);
     const [installing, setInstalling] = useState(false);
@@ -14,6 +20,8 @@ export function useUpdates() {
     const check = useCallback(async (manual = true) => {
         if (!desktop || inFlight.current) return;
         inFlight.current = true;
+        lastCheck.current = Date.now();
+        saveLastUpdateCheck(lastCheck.current);
         setChecking(true);
         setError("");
         try {
@@ -32,13 +40,13 @@ export function useUpdates() {
     }, []);
     useEffect(() => {
         if (!desktop || import.meta.env.DEV) return;
-        const start = setTimeout(() => void check(false), 5000);
-        const timer = setInterval(() => void check(false), 6 * 60 * 60 * 1000);
-        return () => {
-            clearTimeout(start);
-            clearInterval(timer);
-        };
-    }, [check]);
+        return scheduleUpdateChecks(period, () => lastCheck.current, () => check(false));
+    }, [check, period]);
+    const changePeriod = (value: UpdatePeriod) => {
+        const next = updatePeriod(value);
+        saveUpdatePeriod(next);
+        setPeriod(next);
+    };
     const install = async () => {
         if (!info?.version || inFlight.current) return;
         inFlight.current = true;
@@ -63,7 +71,7 @@ export function useUpdates() {
         }
     };
     return {
-        info, checking, installing, progress, error, failedAction, check, install, openRelease,
+        info, checking, installing, progress, error, failedAction, check, install, openRelease, period, changePeriod,
         notified: info?.status === "available" && info.version !== dismissed,
         dismiss: () => setDismissed(info?.version ?? null)
     };
