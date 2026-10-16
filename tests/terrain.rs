@@ -33,9 +33,11 @@ fn migration_groups_legacy_stamps_without_crossing_materials_or_locks() {
         vec!["a", "b", "a", "a"]
     );
     assert!(items[3].locked);
-    assert!(items
-        .iter()
-        .all(|i| matches!(i.kind, ItemKind::TerrainRegion { .. })));
+    assert!(
+        items
+            .iter()
+            .all(|i| matches!(i.kind, ItemKind::TerrainRegion { .. }))
+    );
     assert!(render::hit(&items[0], Point::new(2., 4.), 0.));
     assert!(render::hit(&items[0], Point::new(3., 4.), 0.));
     let migrated = p.clone();

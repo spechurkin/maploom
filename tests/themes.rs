@@ -70,11 +70,13 @@ fn theme_types_are_validated_and_legacy_themes_remain_adaptive() {
     let root = tempfile::tempdir().unwrap();
     let folder = theme(root.path(), "custom");
     let original = fs::read_to_string(folder.join("theme.json")).unwrap();
-    assert!(themes::read_theme(root.path(), "custom")
-        .unwrap()
-        .manifest
-        .mode
-        .is_none());
+    assert!(
+        themes::read_theme(root.path(), "custom")
+            .unwrap()
+            .manifest
+            .mode
+            .is_none()
+    );
     for (value, expected) in [
         (serde_json::json!("dark"), Some(themes::ThemeMode::Dark)),
         (serde_json::json!("light"), Some(themes::ThemeMode::Light)),
@@ -103,9 +105,8 @@ fn variants_share_one_folder_and_resolve_their_own_names_and_modes() {
     let root = tempfile::tempdir().unwrap();
     let id = "Моя тема [夜] ✨";
     let folder = theme(root.path(), id);
-    let mut manifest: serde_json::Value = serde_json::from_str(
-        &fs::read_to_string(folder.join("theme.json")).unwrap()
-    ).unwrap();
+    let mut manifest: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(folder.join("theme.json")).unwrap()).unwrap();
     manifest["variants"] = serde_json::json!([
         {"id": "night", "name": "Ночь", "mode": "dark"},
         {"id": "paper", "name": "Бумага", "mode": "light"}
@@ -125,15 +126,29 @@ fn variants_share_one_folder_and_resolve_their_own_names_and_modes() {
     assert_eq!(dark.theme.manifest.mode, Some(themes::ThemeMode::Dark));
     assert_eq!(light.theme.manifest.mode, Some(themes::ThemeMode::Light));
     assert_eq!(dark.modules, light.modules);
-    assert_eq!(dark.theme.manifest.stylesheet, light.theme.manifest.stylesheet);
-    assert_eq!(themes::package(root.path(), id).unwrap().theme.variant.as_deref(), Some("night"));
+    assert_eq!(
+        dark.theme.manifest.stylesheet,
+        light.theme.manifest.stylesheet
+    );
+    assert_eq!(
+        themes::package(root.path(), id)
+            .unwrap()
+            .theme
+            .variant
+            .as_deref(),
+        Some("night")
+    );
     assert!(themes::package_variant(root.path(), id, Some("missing")).is_err());
     let saved = serde_json::json!({"version":1, "theme":id, "theme_variant":"paper", "dark":true});
     let preferences: maploom::preferences::Preferences = serde_json::from_value(saved).unwrap();
-    let restored: maploom::preferences::Preferences = serde_json::from_slice(
-        &serde_json::to_vec(&preferences).unwrap()
-    ).unwrap();
-    let selected = themes::read_variant(root.path(), restored.theme.as_deref().unwrap(), restored.theme_variant.as_deref()).unwrap();
+    let restored: maploom::preferences::Preferences =
+        serde_json::from_slice(&serde_json::to_vec(&preferences).unwrap()).unwrap();
+    let selected = themes::read_variant(
+        root.path(),
+        restored.theme.as_deref().unwrap(),
+        restored.theme_variant.as_deref(),
+    )
+    .unwrap();
     assert_eq!(selected.variant.as_deref(), Some("paper"));
     assert_eq!(selected.manifest.mode, Some(themes::ThemeMode::Light));
     // Removing a variant cannot silently load a different one.
@@ -147,9 +162,8 @@ fn malformed_variants_are_rejected_without_affecting_other_packages() {
     let root = tempfile::tempdir().unwrap();
     theme(root.path(), "good");
     let folder = theme(root.path(), "bad");
-    let mut manifest: serde_json::Value = serde_json::from_str(
-        &fs::read_to_string(folder.join("theme.json")).unwrap()
-    ).unwrap();
+    let mut manifest: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(folder.join("theme.json")).unwrap()).unwrap();
     for variants in [
         serde_json::json!([{"id":"same", "name":"One", "mode":"dark"}, {"id":"same", "name":"Two", "mode":"light"}]),
         serde_json::json!([{"id":"", "name":"One", "mode":"dark"}]),
@@ -204,7 +218,10 @@ fn oversized_sources_are_rejected_and_example_creation_never_replaces_user_files
     assert_eq!(first, ["Monokai", "GitHub", "Atlas", "Contour"]);
     for id in &first {
         let package = themes::package(root.path(), id).unwrap();
-        assert_eq!(package.theme.manifest.name, if id == "Atlas" { "Atlas Dark" } else { id });
+        assert_eq!(
+            package.theme.manifest.name,
+            if id == "Atlas" { "Atlas Dark" } else { id }
+        );
         assert_eq!(
             package.theme.manifest.mode,
             match id.as_str() {
@@ -219,16 +236,15 @@ fn oversized_sources_are_rejected_and_example_creation_never_replaces_user_files
         } else {
             assert!(package.theme.manifest.entry.is_none());
         }
-        assert!(!themes::preview_stylesheet(root.path(), id)
-            .unwrap()
-            .is_empty());
+        assert!(
+            !themes::preview_stylesheet(root.path(), id)
+                .unwrap()
+                .is_empty()
+        );
         fs::write(root.path().join(id).join("style.css"), b"my edits").unwrap();
     }
     let second = themes::create_example(root.path()).unwrap();
-    assert_eq!(
-        second,
-        ["Monokai 2", "GitHub 2", "Atlas 2", "Contour 2"]
-    );
+    assert_eq!(second, ["Monokai 2", "GitHub 2", "Atlas 2", "Contour 2"]);
     for id in &first {
         assert_eq!(
             fs::read(root.path().join(id).join("style.css")).unwrap(),
@@ -236,7 +252,11 @@ fn oversized_sources_are_rejected_and_example_creation_never_replaces_user_files
         );
     }
     assert_eq!(themes::scan(root.path()).themes.len(), 10);
-    assert_eq!(fs::read_dir(root.path()).unwrap().count(), 8, "Five cards use four folders per example set");
+    assert_eq!(
+        fs::read_dir(root.path()).unwrap().count(),
+        8,
+        "Five cards use four folders per example set"
+    );
     let folder = theme(root.path(), "oversized");
     fs::write(
         folder.join("nested/main.tsx"),

@@ -1,6 +1,6 @@
 //! Editor operations shared by the desktop bridge and engine tests.
 use crate::{document::*, geometry, render};
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 use std::collections::{BTreeMap, HashSet};
 
 /// Move the map origin together with all content, including locked/hidden layers.
@@ -59,14 +59,14 @@ pub fn reconcile_geometry(before: &Project, after: &mut Project) {
             }
             let same_topology = previous.wall_exclusions == i.wall_exclusions
                 && match (&previous.kind, &i.kind) {
-                (ItemKind::Room { rings: a, .. }, ItemKind::Room { rings: b, .. }) => {
-                    a.iter().map(Vec::len).eq(b.iter().map(Vec::len))
-                }
-                (ItemKind::Wall { points: a, .. }, ItemKind::Wall { points: b, .. }) => {
-                    a.len() == b.len()
-                }
-                _ => false,
-            };
+                    (ItemKind::Room { rings: a, .. }, ItemKind::Room { rings: b, .. }) => {
+                        a.iter().map(Vec::len).eq(b.iter().map(Vec::len))
+                    }
+                    (ItemKind::Wall { points: a, .. }, ItemKind::Wall { points: b, .. }) => {
+                        a.len() == b.len()
+                    }
+                    _ => false,
+                };
             Some((i.id.clone(), (a, b, same_topology)))
         })
         .collect();
@@ -79,7 +79,7 @@ pub fn reconcile_geometry(before: &Project, after: &mut Project) {
         if let Some(previous) = old.get(&item.id) {
             if item.path_profile == previous.path_profile
                 && (item.path_style != previous.path_style
-                || matches!((&previous.kind, &item.kind), (ItemKind::Path { points: a, .. }, ItemKind::Path { points: b, .. }) if a.len() != b.len()))
+                    || matches!((&previous.kind, &item.kind), (ItemKind::Path { points: a, .. }, ItemKind::Path { points: b, .. }) if a.len() != b.len()))
             {
                 item.path_profile = None;
             }
@@ -225,10 +225,10 @@ pub fn delete_items(project: &mut Project, level: usize, ids: &HashSet<String>) 
         layer.items.retain(|i| {
             !removed.contains(&i.id)
                 && (i.locked
-                || !i
-                .wall_attachment
-                .as_ref()
-                .is_some_and(|a| removed.contains(&a.wall)))
+                    || !i
+                        .wall_attachment
+                        .as_ref()
+                        .is_some_and(|a| removed.contains(&a.wall)))
         });
     }
     project.sync_portals();
@@ -383,12 +383,12 @@ pub fn attach_portal(
             let (attachment, geometry) = crate::portals::attach(i, position, length)?;
             if matches!(i.kind, ItemKind::Room { .. })
                 && geometry.cuts.iter().any(|(line, lo, hi)| {
-                let section = [
-                    crate::openings::at(*line, *lo),
-                    crate::openings::at(*line, *hi),
-                ];
-                crate::caves::outside(section, &cave_mask, false) != vec![(0., 1.)]
-            })
+                    let section = [
+                        crate::openings::at(*line, *lo),
+                        crate::openings::at(*line, *hi),
+                    ];
+                    crate::caves::outside(section, &cave_mask, false) != vec![(0., 1.)]
+                })
             {
                 return None;
             }

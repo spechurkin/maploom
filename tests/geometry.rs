@@ -13,9 +13,11 @@ fn overlapping_rooms_have_one_outline_and_no_internal_wall() {
     assert_eq!(rings.len(), 1);
     assert_eq!(rings[0].len(), 8);
     assert!((geometry::area(&rings[0]) - 28.).abs() < 0.001);
-    assert!(!rings[0]
-        .windows(2)
-        .any(|w| w[0].x == 2. && w[1].x == 2. && w[0].y == 2. && w[1].y == 4.));
+    assert!(
+        !rings[0]
+            .windows(2)
+            .any(|w| w[0].x == 2. && w[1].x == 2. && w[0].y == 2. && w[1].y == 4.)
+    );
 }
 #[test]
 fn shared_edges_merge_without_overlap_area() {
@@ -25,12 +27,14 @@ fn shared_edges_merge_without_overlap_area() {
     assert_eq!(geometry::area(&rings[0]), 28.);
 }
 fn circle(x: f32, y: f32, radius: f32) -> Vec<Vec<Point>> {
-    vec![(0..512)
-        .map(|n| {
-            let angle = n as f32 * std::f32::consts::TAU / 512.;
-            Point::new(x + radius * angle.cos(), y + radius * angle.sin())
-        })
-        .collect()]
+    vec![
+        (0..512)
+            .map(|n| {
+                let angle = n as f32 * std::f32::consts::TAU / 512.;
+                Point::new(x + radius * angle.cos(), y + radius * angle.sin())
+            })
+            .collect(),
+    ]
 }
 #[test]
 fn circular_and_rectangular_rooms_keep_their_curved_outer_boundary() {
@@ -76,9 +80,11 @@ fn crossing_diagonal_edges_are_split_at_their_actual_intersections() {
     let rings = geometry::union_rooms(&[diamond, rect(-3., -0.5, 6., 1.)]).unwrap();
     assert_eq!(rings.len(), 1);
     assert!((geometry::area(&rings[0]) - 10.5).abs() < 0.001);
-    assert!(rings[0]
-        .iter()
-        .any(|p| (p.x - 1.5).abs() < 0.00001 && (p.y - 0.5).abs() < 0.00001));
+    assert!(
+        rings[0]
+            .iter()
+            .any(|p| (p.x - 1.5).abs() < 0.00001 && (p.y - 0.5).abs() < 0.00001)
+    );
 }
 #[test]
 fn merging_a_curved_room_preserves_uncovered_holes() {

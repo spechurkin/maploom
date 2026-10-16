@@ -46,9 +46,11 @@ fn recursive_catalogs_are_project_scoped_and_external_projects_survive_relocatio
         let mut loaded = maploom::formats::load(&path).unwrap();
         assert!(loaded.library.is_empty());
         assert_eq!(loaded.project.external_assets[id], directory.id);
-        assert!(!serde_json::to_string(&loaded.project)
-            .unwrap()
-            .contains(&directory.path.replace('\\', "\\\\")));
+        assert!(
+            !serde_json::to_string(&loaded.project)
+                .unwrap()
+                .contains(&directory.path.replace('\\', "\\\\"))
+        );
         let mut archive = if extension == "mloom" {
             Some(zip::ZipArchive::new(std::fs::File::open(&path).unwrap()).unwrap())
         } else {
@@ -65,12 +67,14 @@ fn recursive_catalogs_are_project_scoped_and_external_projects_survive_relocatio
                 .any(|w| w.contains("Missing asset catalog"))
         );
         maploom::formats::save(&path, &loaded.project, &loaded.library).unwrap();
-        assert!(catalog::resolve(
-            &mut loaded.project,
-            &mut loaded.library,
-            std::slice::from_ref(&indexed)
-        )
-        .is_empty());
+        assert!(
+            catalog::resolve(
+                &mut loaded.project,
+                &mut loaded.library,
+                std::slice::from_ref(&indexed)
+            )
+            .is_empty()
+        );
         assert_eq!(
             assets::verified_bytes(&loaded.library[id]).unwrap(),
             expected
@@ -199,12 +203,13 @@ fn dd_metadata_logo_and_manifest_select_the_right_catalog_without_a_path_in_the_
     assert_eq!(pack.metadata.author, "Artist");
     assert_eq!(pack.metadata.version, "2");
     assert_eq!(pack.metadata.description, "Stone rooms");
-    assert!(pack
-        .metadata
-        .logo
-        .as_ref()
-        .unwrap()
-        .starts_with("data:image/png;base64,"));
+    assert!(
+        pack.metadata
+            .logo
+            .as_ref()
+            .unwrap()
+            .starts_with("data:image/png;base64,")
+    );
     assert_eq!(indexed.library.len(), 1, "Logo is not a map asset");
     let raw = serde_json::json!({"header":{"asset_manifest":[{"id":"abc"}]},"world":{"width":8,"height":8,"levels":{"0":{}}}});
     let mut loaded =
@@ -220,9 +225,11 @@ fn dd_metadata_logo_and_manifest_select_the_right_catalog_without_a_path_in_the_
         loaded.project.asset_catalogs[0].packs,
         Some(vec!["named.dungeondraft_pack".into()])
     );
-    assert!(!serde_json::to_string(&loaded.project)
-        .unwrap()
-        .contains(&directory.path));
+    assert!(
+        !serde_json::to_string(&loaded.project)
+            .unwrap()
+            .contains(&directory.path)
+    );
 }
 
 #[test]
@@ -262,10 +269,12 @@ fn pack_selection_resolves_the_selected_copy_and_survives_save_relocation_and_re
     png(&root.join("loose.png"));
     let dir = catalog::directory(&root, None).unwrap();
     let indexed = catalog::scan(&dir);
-    assert!(indexed
-        .warnings
-        .iter()
-        .any(|w| w.contains("Duplicate asset")));
+    assert!(
+        indexed
+            .warnings
+            .iter()
+            .any(|w| w.contains("Duplicate asset"))
+    );
     assert_eq!(indexed.pack_key(&indexed.packs[1]), "nested/b.mloom_fabric");
     let mut project = selected(&dir, &first.meta.id);
     project.asset_catalogs[0].packs = Some(vec!["nested/b.mloom_fabric".into()]);
@@ -311,8 +320,10 @@ fn pack_selection_resolves_the_selected_copy_and_survives_save_relocation_and_re
     );
     std::fs::remove_file(moved.join("nested/b.mloom_fabric")).unwrap();
     let refreshed = catalog::scan(&relocated);
-    assert!(catalog::resolve(&mut project, &mut library, &[refreshed])
-        .iter()
-        .any(|w| w.contains("Missing asset pack")));
+    assert!(
+        catalog::resolve(&mut project, &mut library, &[refreshed])
+            .iter()
+            .any(|w| w.contains("Missing asset pack"))
+    );
     assert!(library.is_empty());
 }

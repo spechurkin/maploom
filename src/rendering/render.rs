@@ -3,11 +3,11 @@ use crate::{
     document::*,
     openings::Openings,
 };
-use anyhow::{ensure, Context as _, Result};
-use base64::{engine::general_purpose::STANDARD, Engine};
+use anyhow::{Context as _, Result, ensure};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use egui::{
-    epaint::{Mesh, Vertex},
     Color32, Pos2, Rect, Stroke, TextureHandle, Vec2,
+    epaint::{Mesh, Vertex},
 };
 use std::{
     collections::BTreeMap,
@@ -187,10 +187,10 @@ pub fn hit(item: &Item, p: Point, tolerance: f32) -> bool {
         ItemKind::Room { rings, .. } | ItemKind::TerrainRegion { rings, .. } => {
             crate::geometry::inside(rings, p)
                 || rings.iter().any(|r| {
-                (0..r.len()).any(|i| {
-                    segment_distance(p, r[i], r[(i + 1) % r.len()]) <= tolerance + 0.15
+                    (0..r.len()).any(|i| {
+                        segment_distance(p, r[i], r[(i + 1) % r.len()]) <= tolerance + 0.15
+                    })
                 })
-            })
         }
         ItemKind::Floor { .. } => crate::geometry::inside(&item.floor_rings(), p),
         ItemKind::Path { .. } => crate::paths::item_ribbon(item)
@@ -519,15 +519,15 @@ fn draw_scene_impl(
                 Pos2::new(
                     project.width as f32
                         / (texture_size(
-                        project.background_asset.as_deref().unwrap_or_default(),
-                        texture,
-                    )
+                            project.background_asset.as_deref().unwrap_or_default(),
+                            texture,
+                        )
                         .x / 256.),
                     project.height as f32
                         / (texture_size(
-                        project.background_asset.as_deref().unwrap_or_default(),
-                        texture,
-                    )
+                            project.background_asset.as_deref().unwrap_or_default(),
+                            texture,
+                        )
                         .y / 256.),
                 ),
             ),
@@ -592,12 +592,13 @@ fn draw_scene_impl(
                         for (id, lines) in [
                             (
                                 edge,
-                                vec![roof
-                                    .outline
-                                    .iter()
-                                    .copied()
-                                    .chain(roof.outline.first().copied())
-                                    .collect::<Vec<_>>()],
+                                vec![
+                                    roof.outline
+                                        .iter()
+                                        .copied()
+                                        .chain(roof.outline.first().copied())
+                                        .collect::<Vec<_>>(),
+                                ],
                             ),
                             (hip, roof.hips.iter().map(|line| line.to_vec()).collect()),
                             (ridge, vec![roof.ridge]),
@@ -665,7 +666,7 @@ fn draw_scene_impl(
                                             wall.as_deref().unwrap_or_default(),
                                             texture,
                                         )
-                                            .x / 256.)
+                                        .x / 256.)
                                             .max(0.1),
                                         texture,
                                         tint: color(
@@ -825,7 +826,7 @@ fn draw_scene_impl(
                                     cave.blasts.clone(),
                                     cave_rooms.clone(),
                                 ])
-                                    .unwrap_or_default();
+                                .unwrap_or_default();
                                 for ring in rings {
                                     let ribbon = crate::caves::wall_ribbon(ring, size.y, size.x);
                                     let tint = color(
@@ -1092,14 +1093,14 @@ fn draw_scene_impl(
                                 length,
                                 length
                                     * texture_size(
-                                    item.texture.as_deref().unwrap_or_default(),
-                                    texture,
-                                )
+                                        item.texture.as_deref().unwrap_or_default(),
+                                        texture,
+                                    )
                                     .y
                                     / texture_size(
-                                    item.texture.as_deref().unwrap_or_default(),
-                                    texture,
-                                )
+                                        item.texture.as_deref().unwrap_or_default(),
+                                        texture,
+                                    )
                                     .x,
                             );
                             let rotation =
@@ -1969,7 +1970,7 @@ fn export_floors(
                 },
                 format,
             )
-                .with_context(|| format!("Could not export floor {}", floor.name))?;
+            .with_context(|| format!("Could not export floor {}", floor.name))?;
             archive.start_file(names[index].as_str(), zip_options)?;
             archive.write_all(&data)?;
         }
@@ -2069,7 +2070,7 @@ pub fn floor_export_names(
     )
 }
 
-fn unique_export_names(names: impl IntoIterator<Item=String>, extension: &str) -> Vec<String> {
+fn unique_export_names(names: impl IntoIterator<Item = String>, extension: &str) -> Vec<String> {
     let mut used = std::collections::HashSet::new();
     names
         .into_iter()
@@ -2133,7 +2134,7 @@ pub fn export_variations(
                 format,
                 Some(name),
             )
-                .with_context(|| format!("Could not export variation {name}"))?;
+            .with_context(|| format!("Could not export variation {name}"))?;
         }
         for file in &names {
             let mut source = std::fs::File::open(staging.path().join(file))?;
@@ -2158,7 +2159,7 @@ pub fn export_variations(
                     },
                     format,
                 )
-                    .with_context(|| format!("Could not export variation {name}"))?;
+                .with_context(|| format!("Could not export variation {name}"))?;
                 archive.start_file(file_name.as_str(), zip_options)?;
                 archive.write_all(&data)?;
             }
@@ -2424,13 +2425,13 @@ fn svg_surface(project: &Project, library: &Library, options: ExportOptions) -> 
     };
     let ambient_tinted = options.lights
         && svg
-        .tint([
-            project.ambient_light[0],
-            project.ambient_light[1],
-            project.ambient_light[2],
-            255,
-        ])
-        .is_some();
+            .tint([
+                project.ambient_light[0],
+                project.ambient_light[1],
+                project.ambient_light[2],
+                255,
+            ])
+            .is_some();
     svg.out.push_str(&format!(
         "<rect width=\"{}\" height=\"{}\" fill=\"#{:02x}{:02x}{:02x}\" fill-opacity=\"{}\"/>",
         project.width,
@@ -2560,11 +2561,11 @@ fn svg_surface(project: &Project, library: &Library, options: ExportOptions) -> 
                                 let size = library[id].meta.size;
                                 let factor = item.texture_scale
                                     / item
-                                    .texture
-                                    .as_ref()
-                                    .map(|id| library[id].meta.size.x)
-                                    .unwrap_or(4.)
-                                    .max(0.01);
+                                        .texture
+                                        .as_ref()
+                                        .map(|id| library[id].meta.size.x)
+                                        .unwrap_or(4.)
+                                        .max(0.01);
                                 svg.wall(lines, id, (size.y * factor).max(0.015), size.x * factor)?;
                             }
                         }
@@ -2626,7 +2627,7 @@ fn svg_surface(project: &Project, library: &Library, options: ExportOptions) -> 
                                     cave.blasts.clone(),
                                     cave_rooms.clone(),
                                 ])
-                                    .unwrap_or_default();
+                                .unwrap_or_default();
                                 let clip = format!("cavecut{}", svg.next);
                                 svg.next += 1;
                                 let mut path =

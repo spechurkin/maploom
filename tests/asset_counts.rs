@@ -1,6 +1,6 @@
 use maploom::assets;
 use std::io::{BufWriter, Cursor, Write};
-use zip::{write::SimpleFileOptions, ZipArchive, ZipWriter};
+use zip::{ZipArchive, ZipWriter, write::SimpleFileOptions};
 
 const ENTRY_COUNT: u32 = 200_001;
 

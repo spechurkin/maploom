@@ -144,11 +144,12 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
     // Picking owns the combined parts as one instance; separate placements
     // retain independent owners and may therefore use more mesh batches.
     let owner = &combined.levels[0].layers[1].items[0].id;
-    assert!(a
-        .meshes
-        .iter()
-        .filter_map(|m| m.item.as_ref())
-        .all(|id| id == owner));
+    assert!(
+        a.meshes
+            .iter()
+            .filter_map(|m| m.item.as_ref())
+            .all(|id| id == owner)
+    );
     assert!(b.meshes.iter().filter_map(|m| m.item.as_ref()).all(|id| {
         expected.levels[0].layers[1]
             .items
@@ -156,7 +157,7 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
             .any(|i| &i.id == id)
     }));
     let triangles = |scene: &maploom::gpu_scene::GpuScene| {
-        use base64::{engine::general_purpose::STANDARD, Engine};
+        use base64::{Engine, engine::general_purpose::STANDARD};
         scene
             .meshes
             .iter()
@@ -186,9 +187,11 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
     combined.levels[0].layers[1].items =
         vec![prefab.instance(Point::new(10., 10.), 1., 0.).unwrap()];
     assert_eq!(formats::line_of_sight(&combined.levels[0]).len(), 4);
-    assert!(maploom::light::Blockers::new(&combined, 0, &library)
-        .visibility(Point::new(5., 5.), 10.)
-        .is_some());
+    assert!(
+        maploom::light::Blockers::new(&combined, 0, &library)
+            .visibility(Point::new(5., 5.), 10.)
+            .is_some()
+    );
 }
 
 #[test]
@@ -313,9 +316,11 @@ fn portable_archive_survives_removed_sources_relocation_and_personal_library_edi
         background_asset: None,
         ..Project::default()
     };
-    project.levels[0].layers[1].items = vec![store.personal[0]
-        .instance(Point::new(5., 5.), 1., 0.)
-        .unwrap()];
+    project.levels[0].layers[1].items = vec![
+        store.personal[0]
+            .instance(Point::new(5., 5.), 1., 0.)
+            .unwrap(),
+    ];
     let map = temp.path().join("placed.mloom");
     formats::save(&map, &project, &store.assets).unwrap();
     store.personal.clear();

@@ -4,7 +4,7 @@ use crate::{
     document::{CatalogRef, Project},
     preferences::AssetDirectory,
 };
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 use std::{
     collections::HashSet,
     path::{Path, PathBuf},
@@ -223,13 +223,13 @@ pub fn select_for_dd(project: &mut Project, directories: &[AssetDirectory], cata
             .filter(|pack| {
                 (!pack.metadata.id.is_empty()
                     && header.as_array().is_some_and(|list| {
-                    list.iter()
-                        .any(|entry| entry["id"].as_str() == Some(&pack.metadata.id))
-                }))
+                        list.iter()
+                            .any(|entry| entry["id"].as_str() == Some(&pack.metadata.id))
+                    }))
                     || pack
-                    .assets
-                    .iter()
-                    .any(|asset| wanted.contains(&asset.meta.id))
+                        .assets
+                        .iter()
+                        .any(|asset| wanted.contains(&asset.meta.id))
             })
             .map(|pack| catalog.pack_key(pack))
             .collect();
@@ -239,15 +239,17 @@ pub fn select_for_dd(project: &mut Project, directories: &[AssetDirectory], cata
         {
             packs.push(String::new());
         }
-        if !packs.is_empty()
-            && let Some(dir) = directories.iter().find(|dir| dir.id == catalog.id)
-        {
-            project.asset_catalogs.push(CatalogRef {
-                id: dir.id.clone(),
-                name: dir.name.clone(),
-                packs: Some(packs),
-            });
+        if packs.is_empty() {
+            continue;
         }
+        let Some(dir) = directories.iter().find(|dir| dir.id == catalog.id) else {
+            continue;
+        };
+        project.asset_catalogs.push(CatalogRef {
+            id: dir.id.clone(),
+            name: dir.name.clone(),
+            packs: Some(packs),
+        });
     }
 }
 
@@ -267,9 +269,9 @@ pub fn resolve(project: &mut Project, library: &mut Library, catalogs: &[Catalog
                 for key in packs {
                     if !key.is_empty()
                         && !catalog
-                        .packs
-                        .iter()
-                        .any(|pack| catalog.pack_key(pack) == *key)
+                            .packs
+                            .iter()
+                            .any(|pack| catalog.pack_key(pack) == *key)
                     {
                         warnings.push(format!("Missing asset pack: {key} in {}", selected.name));
                     }
@@ -353,7 +355,7 @@ fn repair_legacy_path_sizes(project: &mut Project, library: &Library) {
                 && asset.meta.size != meta.size
                 && assets::category(&asset.meta) == "paths"
                 && is_pck(&asset.source))
-                .then(|| (id.clone(), asset.meta.size))
+            .then(|| (id.clone(), asset.meta.size))
         })
         .collect();
     if corrected.is_empty() {

@@ -1,5 +1,5 @@
 #![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use maploom::{
     assets,
     document::Project,

@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::{self, Asset, Library, Source},
     document::*,
@@ -312,9 +312,11 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
         .position(|m| &m.texture == water_key)
         .unwrap();
     assert!(first_land < first_water);
-    assert!(scene.meshes[first_water + 1..]
-        .iter()
-        .any(|m| m.texture != *water_key));
+    assert!(
+        scene.meshes[first_water + 1..]
+            .iter()
+            .any(|m| m.texture != *water_key)
+    );
     let svg = maploom::render::svg(
         &p,
         &library,
@@ -369,10 +371,12 @@ fn unchanged_meshes_are_referenced_and_a_reload_recovers_their_data() {
     let mut next = options(1);
     next.known_meshes = mesh_keys.clone();
     let repeated = renderer.scene(&project, &library, next, &known).unwrap();
-    assert!(repeated
-        .meshes
-        .iter()
-        .all(|m| m.vertices.is_empty() && m.indices.is_empty()));
+    assert!(
+        repeated
+            .meshes
+            .iter()
+            .all(|m| m.vertices.is_empty() && m.indices.is_empty())
+    );
     project.levels[0].layers[1].items[0].floor_tint = [30, 80, 150, 255];
     let mut next = options(2);
     next.known_meshes = mesh_keys;
@@ -383,10 +387,12 @@ fn unchanged_meshes_are_referenced_and_a_reload_recovers_their_data() {
     let reloaded = renderer
         .scene(&project, &library, options(2), &HashSet::new())
         .unwrap();
-    assert!(reloaded
-        .meshes
-        .iter()
-        .all(|m| !m.vertices.is_empty() && !m.indices.is_empty()));
+    assert!(
+        reloaded
+            .meshes
+            .iter()
+            .all(|m| !m.vertices.is_empty() && !m.indices.is_empty())
+    );
     assert_eq!(reloaded.stats.decoded_images, 0);
     assert_eq!(
         colored.meshes.iter().map(|m| &m.key).collect::<Vec<_>>(),
@@ -522,12 +528,16 @@ fn terrain_tiles_are_opaque_but_borders_keep_their_coverage() {
             assets::decode(&bytes).unwrap()
         })
         .collect();
-    assert!(images
-        .iter()
-        .any(|i| i.pixels().all(|p| p.0 == [20, 40, 60, 255])));
-    assert!(images
-        .iter()
-        .any(|i| i.pixels().all(|p| p.0 == [80, 60, 40, 70])));
+    assert!(
+        images
+            .iter()
+            .any(|i| i.pixels().all(|p| p.0 == [20, 40, 60, 255]))
+    );
+    assert!(
+        images
+            .iter()
+            .any(|i| i.pixels().all(|p| p.0 == [80, 60, 40, 70]))
+    );
     let svg = maploom::render::svg(
         &p,
         &library,

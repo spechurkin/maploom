@@ -1,10 +1,10 @@
 use crate::{
-    assets::{self, safe_member, Asset, Library, Source, MAX_JSON},
+    assets::{self, Asset, Library, MAX_JSON, Source, safe_member},
     document::*,
 };
-use anyhow::{ensure, Context, Result};
-use base64::{engine::general_purpose::STANDARD, Engine};
-use serde_json::{json, Value};
+use anyhow::{Context, Result, ensure};
+use base64::{Engine, engine::general_purpose::STANDARD};
+use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, HashSet},
     fs::File,
@@ -12,7 +12,7 @@ use std::{
     path::Path,
     sync::Arc,
 };
-use zip::{write::SimpleFileOptions, ZipArchive, ZipWriter};
+use zip::{ZipArchive, ZipWriter, write::SimpleFileOptions};
 
 pub struct Loaded {
     pub project: Project,
@@ -313,7 +313,7 @@ fn portal(v: &Value) -> Item {
             color: [157, 113, 76, 255],
         },
     )
-        .with_texture(v["texture"].as_str())
+    .with_texture(v["texture"].as_str())
 }
 pub fn import_dungeondraft(raw: Value, path: &Path) -> Result<Loaded> {
     let world = &raw["world"];
@@ -365,7 +365,7 @@ pub fn import_dungeondraft(raw: Value, path: &Path) -> Result<Loaded> {
                             color: [154, 149, 131, 255],
                         },
                     )
-                        .with_texture(v["tiles"]["lookup"]["0"].as_str()),
+                    .with_texture(v["tiles"]["lookup"]["0"].as_str()),
                 );
             }
         }
@@ -385,7 +385,7 @@ pub fn import_dungeondraft(raw: Value, path: &Path) -> Result<Loaded> {
                             color: dd_color(&pattern["color"], [147, 135, 108, 255]),
                         },
                     )
-                        .with_texture(pattern["texture"].as_str()),
+                    .with_texture(pattern["texture"].as_str()),
                 );
             }
         }
@@ -408,7 +408,7 @@ pub fn import_dungeondraft(raw: Value, path: &Path) -> Result<Loaded> {
                             blocks_sight: true,
                         },
                     )
-                        .with_texture(wall["texture"].as_str()),
+                    .with_texture(wall["texture"].as_str()),
                 );
             }
             for p in values(&wall["portals"]) {
@@ -430,7 +430,7 @@ pub fn import_dungeondraft(raw: Value, path: &Path) -> Result<Loaded> {
                             color: dd_color(&line["color"], [129, 115, 89, 255]),
                         },
                     )
-                        .with_texture(line["texture"].as_str()),
+                    .with_texture(line["texture"].as_str()),
                 );
             }
         }

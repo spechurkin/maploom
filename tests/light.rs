@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::Library,
     document::*,
@@ -159,14 +159,18 @@ fn svg_embeds_the_same_light_profile_color_alpha_and_radius_and_honors_visibilit
         assert_eq!(actual.0, multiply_colors(expected.0, [75, 155, 255, 180]));
     }
     options.lights = false;
-    assert!(!render::svg(&p, &Library::new(), options)
-        .unwrap()
-        .contains("data:image/png;base64,"));
+    assert!(
+        !render::svg(&p, &Library::new(), options)
+            .unwrap()
+            .contains("data:image/png;base64,")
+    );
     options.lights = true;
     p.levels[0].layers[0].visible = false;
-    assert!(!render::svg(&p, &Library::new(), options)
-        .unwrap()
-        .contains("data:image/png;base64,"));
+    assert!(
+        !render::svg(&p, &Library::new(), options)
+            .unwrap()
+            .contains("data:image/png;base64,")
+    );
     let vtt = formats::dd2vtt(&fixture(0.), 0, 64, b"PNG", &Library::new());
     assert_eq!(vtt["lights"][0]["range"], 3.);
     assert_eq!(vtt["lights"][0]["color"], "b44b9bff");
@@ -186,10 +190,12 @@ fn gpu_reuses_stamps_for_color_size_and_movement_but_updates_smoothing() {
     let first = renderer
         .scene(&p, &Library::new(), options(0, true), &HashSet::new())
         .unwrap();
-    assert!(first
-        .textures
-        .iter()
-        .any(|t| t.width == 512 && t.height == 512));
+    assert!(
+        first
+            .textures
+            .iter()
+            .any(|t| t.width == 512 && t.height == 512)
+    );
     let known = first.used_textures.iter().cloned().collect();
     if let ItemKind::Light {
         color,
@@ -232,13 +238,16 @@ fn gpu_reuses_stamps_for_color_size_and_movement_but_updates_smoothing() {
     let soft = renderer
         .scene(&p, &Library::new(), options(2, true), &known)
         .unwrap();
-    assert!(soft
-        .textures
-        .iter()
-        .any(|t| t.width == 512 && t.height == 512));
-    assert!(renderer
-        .scene(&p, &Library::new(), options(3, false), &known)
-        .unwrap()
-        .textures
-        .is_empty());
+    assert!(
+        soft.textures
+            .iter()
+            .any(|t| t.width == 512 && t.height == 512)
+    );
+    assert!(
+        renderer
+            .scene(&p, &Library::new(), options(3, false), &known)
+            .unwrap()
+            .textures
+            .is_empty()
+    );
 }
