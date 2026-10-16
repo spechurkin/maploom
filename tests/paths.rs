@@ -24,7 +24,7 @@ fn path() -> Item {
             color: [255; 4],
         },
     )
-        .with_texture(Some("res://textures/paths/path_blender_03.png"));
+    .with_texture(Some("res://textures/paths/path_blender_03.png"));
     i.path_style = Some(PathStyle {
         smoothness: 1.,
         ..Default::default()
@@ -50,9 +50,11 @@ fn smoothing_rounds_corners_without_blurring_and_uvs_follow_the_entire_curve() {
     assert!(sharp.iter().all(|p| p.y == 4. || p.x == 8. || p.y == 10.));
     assert!(smooth.iter().any(|p| p.y < 3.8));
     let ribbon = paths::item_ribbon(&path());
-    assert!(ribbon
-        .iter()
-        .all(|v| v.alpha == 1. && (v.uv.y == 0. || v.uv.y == 1.) && v.position.finite()));
+    assert!(
+        ribbon
+            .iter()
+            .all(|v| v.alpha == 1. && (v.uv.y == 0. || v.uv.y == 1.) && v.position.finite())
+    );
     assert!(ribbon.windows(2).all(|v| v[1].uv.x >= v[0].uv.x));
     let total: f32 = smooth.windows(2).map(|p| p[0].distance(p[1])).sum();
     assert!((ribbon.last().unwrap().uv.x - total / 2.).abs() < 1e-5);
@@ -80,13 +82,15 @@ fn transitions_are_independent_and_selection_follows_the_rendered_curve() {
             ..Default::default()
         },
     );
-    assert!(long
-        .iter()
-        .any(|v| (v.position.x - 0.05).abs() < 1e-6 && (v.alpha - 0.5).abs() < 1e-5));
-    assert!(long
-        .iter()
-        .filter(|v| v.position.x >= 0.1)
-        .all(|v| v.alpha == 1.));
+    assert!(
+        long.iter()
+            .any(|v| (v.position.x - 0.05).abs() < 1e-6 && (v.alpha - 0.5).abs() < 1e-5)
+    );
+    assert!(
+        long.iter()
+            .filter(|v| v.position.x >= 0.1)
+            .all(|v| v.alpha == 1.)
+    );
     let i = path();
     let ps = paths::sample(&points(), 1.);
     let p = ps[10];
@@ -117,9 +121,11 @@ fn path_style_roundtrips_and_block_light_controls_vtt_and_light_visibility() {
         formats::line_of_sight(&p.levels[0]).len(),
         paths::sample(&points(), 1.).len() - 1
     );
-    assert!(maploom::light::Blockers::new(&p, 0, &Library::new())
-        .visibility(Point::new(4., 2.), 20.)
-        .is_some());
+    assert!(
+        maploom::light::Blockers::new(&p, 0, &Library::new())
+            .visibility(Point::new(4., 2.), 20.)
+            .is_some()
+    );
     let dir = tempfile::tempdir().unwrap();
     let file = dir.path().join("paths.mloom");
     formats::save(&file, &p, &Library::new()).unwrap();
@@ -128,10 +134,12 @@ fn path_style_roundtrips_and_block_light_controls_vtt_and_light_visibility() {
     assert!(formats::line_of_sight(&p.levels[0]).is_empty());
     let mut value = serde_json::to_value(path()).unwrap();
     value.as_object_mut().unwrap().remove("path_style");
-    assert!(serde_json::from_value::<Item>(value)
-        .unwrap()
-        .path_style
-        .is_none());
+    assert!(
+        serde_json::from_value::<Item>(value)
+            .unwrap()
+            .path_style
+            .is_none()
+    );
 }
 #[test]
 fn width_and_smoothness_are_validated_on_the_document_boundary() {
@@ -242,7 +250,7 @@ fn textured_paths_generate_native_gpu_raster_and_svg_exports() {
     if let Some(output) = std::env::var_os("MAPLOOM_PATH_EVIDENCE") {
         let output = std::path::PathBuf::from(output);
         std::fs::create_dir_all(&output).unwrap();
-        use base64::{engine::general_purpose::STANDARD, Engine};
+        use base64::{Engine, engine::general_purpose::STANDARD};
         let mut thumbnails = std::collections::BTreeMap::new();
         for id in &ids {
             let image = assets::decode_surface(&library[id]).unwrap();
@@ -268,7 +276,7 @@ fn textured_paths_generate_native_gpu_raster_and_svg_exports() {
             output.join("scene.json"),
             serde_json::to_vec(&scene).unwrap(),
         )
-            .unwrap();
+        .unwrap();
         std::fs::write(output.join("project.json"), serde_json::to_vec(&p).unwrap()).unwrap();
         std::fs::write(output.join("paths.svg"), svg).unwrap();
         let (image, _) = render::rasterize(&p, &library, options()).unwrap();

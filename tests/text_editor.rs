@@ -185,7 +185,7 @@ fn gpu_bounds_and_svg_export_support_local_fonts_multiline_text_and_styled_box()
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     assert!(svg.contains("stroke-width=\"0.04\""));
     assert!(svg.contains("<path fill=\"#5a280a\""));
     assert!(

@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::{self, Asset, Library, Source},
     document::*,
@@ -190,7 +190,7 @@ fn every_rendered_type_keeps_its_owner_including_early_return_branches_and_cache
             path,
             serde_json::to_vec(&json!({"scene":scene,"project":project})).unwrap(),
         )
-            .unwrap();
+        .unwrap();
     }
     let cached = renderer
         .scene(

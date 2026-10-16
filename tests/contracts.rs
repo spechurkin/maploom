@@ -73,7 +73,7 @@ fn red_mask_changes_only_the_paintable_regions_and_preserves_green_leaves() {
             220, 20, 20, 255, 40, 140, 60, 255, 150, 150, 150, 255, 140, 100, 60, 255,
         ],
     )
-        .unwrap();
+    .unwrap();
     assets::recolor_red_mask(&mut image, [20, 80, 220, 255]);
     assert_eq!(image.get_pixel(0, 0).0, [36, 83, 193, 255]);
     assert_eq!(image.get_pixel(1, 0).0, [40, 140, 60, 255]);
@@ -130,7 +130,7 @@ fn regular_objects_keep_original_colors_in_the_renderer_and_svg() {
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     assert!(!svg.contains("feColorMatrix"));
 }
 #[test]
@@ -209,7 +209,7 @@ fn independent_room_colors_survive_save_and_render_in_both_gpu_meshes_and_svg() 
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     assert_eq!(svg.matches("<feColorMatrix").count(), 2);
     let mut old: serde_json::Value = serde_json::to_value(item).unwrap();
     old.as_object_mut().unwrap().remove("floor_tint");
@@ -682,13 +682,13 @@ fn locales_are_versioned_and_paths_cannot_be_ids() {
         Locale::parse(
             br#"{"format":"maploom/locale","version":1,"id":"../bad","name":"Bad","strings":{}}"#
         )
-            .is_err()
+        .is_err()
     );
     assert!(
         Locale::parse(
             br#"{"format":"maploom/locale","version":2,"id":"de","name":"German","strings":{}}"#
         )
-            .is_err()
+        .is_err()
     );
 }
 #[test]

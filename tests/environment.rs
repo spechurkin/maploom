@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::Library,
     document::*,
@@ -99,13 +99,17 @@ fn gpu_tints_the_map_but_preserves_sources_and_reuses_textures() {
         "Changing ambient color must reuse textures"
     );
     let base = tinted.meshes.iter().find(|m| m.texture != stamp).unwrap();
-    assert!(colors(base)
-        .iter()
-        .any(|c| *c == [64. / 255., 128. / 255., 1., 1.]));
-    assert!(colors(base)
-        .iter()
-        .filter(|c| c[3] == 1.)
-        .all(|c| *c == [64. / 255., 128. / 255., 1., 1.]));
+    assert!(
+        colors(base)
+            .iter()
+            .any(|c| *c == [64. / 255., 128. / 255., 1., 1.])
+    );
+    assert!(
+        colors(base)
+            .iter()
+            .filter(|c| c[3] == 1.)
+            .all(|c| *c == [64. / 255., 128. / 255., 1., 1.])
+    );
     assert_eq!(
         original
             .meshes
@@ -133,10 +137,12 @@ fn gpu_tints_the_map_but_preserves_sources_and_reuses_textures() {
         .scene(&p, &Library::new(), options(false), &known)
         .unwrap();
     assert!(unlit.meshes.iter().all(|m| m.texture != stamp));
-    assert!(colors(&unlit.meshes[0])
-        .iter()
-        .filter(|c| c[3] == 1.)
-        .all(|c| *c == [1.; 4]));
+    assert!(
+        colors(&unlit.meshes[0])
+            .iter()
+            .filter(|c| c[3] == 1.)
+            .all(|c| *c == [1.; 4])
+    );
 }
 
 #[test]
@@ -184,16 +190,18 @@ fn native_scene_and_exports_apply_ambient_only_to_the_map() {
         "Sources follow the ambient filter group"
     );
     assert!(svg.contains("0.2509804 0 0 0 0 0 0.5019608"));
-    assert!(!render::svg(
-        &p,
-        &Library::new(),
-        render::ExportOptions {
-            lights: false,
-            ..opts
-        }
-    )
+    assert!(
+        !render::svg(
+            &p,
+            &Library::new(),
+            render::ExportOptions {
+                lights: false,
+                ..opts
+            }
+        )
         .unwrap()
-        .contains("feColorMatrix"));
+        .contains("feColorMatrix")
+    );
     assert_eq!(
         formats::dd2vtt(&p, 0, 32, b"PNG", &Library::new())["environment"]["ambient_light"],
         "ff4080ff"
@@ -248,9 +256,11 @@ fn ambient_light_multiplies_red_mask_output_without_changing_the_selected_tint()
         .scene(&p, &library, options(true), &HashSet::new())
         .unwrap();
     let masked = scene.meshes.iter().find(|m| m.mode == 1).unwrap();
-    assert!(colors(masked)
-        .iter()
-        .all(|c| *c == [64. / 255., 128. / 255., 192. / 255., 1.]));
+    assert!(
+        colors(masked)
+            .iter()
+            .all(|c| *c == [64. / 255., 128. / 255., 192. / 255., 1.])
+    );
     for vertex in STANDARD.decode(&masked.vertices).unwrap().chunks_exact(48) {
         let tint: [f32; 4] = std::array::from_fn(|i| {
             f32::from_le_bytes(vertex[32 + i * 4..36 + i * 4].try_into().unwrap())

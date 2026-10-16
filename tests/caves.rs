@@ -107,9 +107,11 @@ fn rooms_win_in_both_draw_orders_across_layers_and_internal_boundaries_disappear
             openings.spans([Point::new(7., 1.), Point::new(12., 1.)]),
             vec![(0., 1.)]
         );
-        assert!(openings
-            .spans([Point::new(12., 9.), Point::new(7., 9.)])
-            .is_empty());
+        assert!(
+            openings
+                .spans([Point::new(12., 9.), Point::new(7., 9.)])
+                .is_empty()
+        );
         let spans = openings.spans([Point::new(12., 1.), Point::new(12., 9.)]);
         assert_eq!(spans, vec![(0., 0.125)]);
         assert!(editing::attach_portal(&p, 0, Point::new(9., 9.), 1.).is_err());
@@ -297,7 +299,7 @@ fn curved_cave_edges_render_both_materials() {
             out.join("curved.svg"),
             render::svg(&p, &library, options).unwrap(),
         )
-            .unwrap();
+        .unwrap();
         std::fs::write(out.join("scene.json"), serde_json::to_vec(&scene).unwrap()).unwrap();
     }
 }

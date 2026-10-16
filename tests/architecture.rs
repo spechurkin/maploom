@@ -78,12 +78,14 @@ fn contour_wall_switches_control_vtt_blockers_and_keep_floor_holes() {
 #[test]
 fn arbitrary_rooms_are_added_without_rectangular_partitioning() {
     for n in [3, 6, 32, 512] {
-        let rings = vec![(0..n)
-            .map(|i| {
-                let angle = i as f32 * std::f32::consts::TAU / n as f32;
-                Point::new(5. + 3. * angle.cos(), 5. + 3. * angle.sin())
-            })
-            .collect()];
+        let rings = vec![
+            (0..n)
+                .map(|i| {
+                    let angle = i as f32 * std::f32::consts::TAU / n as f32;
+                    Point::new(5. + 3. * angle.cos(), 5. + 3. * angle.sin())
+                })
+                .collect(),
+        ];
         let mut p = Project::default();
         let i = Item::new(
             "Polygon room",
@@ -172,10 +174,12 @@ fn portal_segments_follow_insertions_deletions_resizing_and_wall_switches() {
     }
     editing::reconcile_geometry(&p, &mut next);
     next.sync_portals();
-    assert!(next.levels[0].layers[2].items[0]
-        .points()
-        .iter()
-        .all(|p| (p.x - 20.).abs() < 0.001));
+    assert!(
+        next.levels[0].layers[2].items[0]
+            .points()
+            .iter()
+            .all(|p| (p.x - 20.).abs() < 0.001)
+    );
     p = next.clone();
     next.levels[0].layers[1].items[0].wall_exclusions = vec![0];
     editing::reconcile_geometry(&p, &mut next);
@@ -262,7 +266,7 @@ fn floor_cutouts_and_room_wall_switches_match_meshes_svg_and_raster_exports() {
                     color: [255; 4],
                 },
             )
-                .with_texture(Some("floor"));
+            .with_texture(Some("floor"));
             i.floor_holes = vec![rect(3., 3., 2., 2.)];
             i
         };

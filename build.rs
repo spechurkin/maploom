@@ -11,7 +11,7 @@ fn main() {
             ["maploom"],
             embed_resource::NONE,
         )
-            .manifest_required()
-            .expect("Could not embed the Maploom Windows icon");
+        .manifest_required()
+        .expect("Could not embed the Maploom Windows icon");
     }
 }

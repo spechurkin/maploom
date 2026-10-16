@@ -28,7 +28,7 @@ fn combined_instance_selects_by_parts_and_moves_duplicates_and_deletes_as_one_it
         "Pair".into(),
         vec![object("a", -4., 0.), object("b", 4., 0.)],
     )
-        .unwrap();
+    .unwrap();
     let mut item = prefab.instance(Point::new(10., 10.), 1., 0.).unwrap();
     assert!(render::hit(&item, Point::new(6., 10.), 0.01));
     assert!(render::hit(&item, Point::new(14., 10.), 0.01));
@@ -94,7 +94,7 @@ fn combined_instance_selects_by_parts_and_moves_duplicates_and_deletes_as_one_it
             object("c", 1., 1.),
         ],
     )
-        .unwrap();
+    .unwrap();
     assert_eq!(captured.items.len(), 3);
     assert!(captured.items.iter().all(|i| i.prefab.is_none()));
 }
@@ -144,11 +144,12 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
     // Picking owns the combined parts as one instance; separate placements
     // retain independent owners and may therefore use more mesh batches.
     let owner = &combined.levels[0].layers[1].items[0].id;
-    assert!(a
-        .meshes
-        .iter()
-        .filter_map(|m| m.item.as_ref())
-        .all(|id| id == owner));
+    assert!(
+        a.meshes
+            .iter()
+            .filter_map(|m| m.item.as_ref())
+            .all(|id| id == owner)
+    );
     assert!(b.meshes.iter().filter_map(|m| m.item.as_ref()).all(|id| {
         expected.levels[0].layers[1]
             .items
@@ -156,7 +157,7 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
             .any(|i| &i.id == id)
     }));
     let triangles = |scene: &maploom::gpu_scene::GpuScene| {
-        use base64::{engine::general_purpose::STANDARD, Engine};
+        use base64::{Engine, engine::general_purpose::STANDARD};
         scene
             .meshes
             .iter()
@@ -186,9 +187,11 @@ fn combined_dd_prefab_renders_original_components_in_svg_and_keeps_child_light_b
     combined.levels[0].layers[1].items =
         vec![prefab.instance(Point::new(10., 10.), 1., 0.).unwrap()];
     assert_eq!(formats::line_of_sight(&combined.levels[0]).len(), 4);
-    assert!(maploom::light::Blockers::new(&combined, 0, &library)
-        .visibility(Point::new(5., 5.), 10.)
-        .is_some());
+    assert!(
+        maploom::light::Blockers::new(&combined, 0, &library)
+            .visibility(Point::new(5., 5.), 10.)
+            .is_some()
+    );
 }
 
 #[test]
@@ -261,7 +264,7 @@ fn rejects_single_objects_mixed_selections_invalid_transforms_and_missing_images
         "Valid".into(),
         vec![object("a", 0., 0.), object("a", 1., 0.)],
     )
-        .unwrap();
+    .unwrap();
     assert!(prefab.place(Point::new(0., 0.), f32::NAN, 0.).is_err());
     assert!(prefab.place(Point::new(0., 0.), 0., 0.).is_err());
     assert!(prefabs::portable(&[prefab], &Library::new()).is_err());
@@ -285,7 +288,7 @@ fn portable_archive_survives_removed_sources_relocation_and_personal_library_edi
             object(&image.meta.id, 3., 0.),
         ],
     )
-        .unwrap();
+    .unwrap();
     let library = Library::from([(image.meta.id.clone(), image)]);
     let (prefabs, images) = prefabs::portable(&[prefab], &library).unwrap();
     assert_eq!(images.len(), 1, "shared image is embedded once");
@@ -313,9 +316,11 @@ fn portable_archive_survives_removed_sources_relocation_and_personal_library_edi
         background_asset: None,
         ..Project::default()
     };
-    project.levels[0].layers[1].items = vec![store.personal[0]
-        .instance(Point::new(5., 5.), 1., 0.)
-        .unwrap()];
+    project.levels[0].layers[1].items = vec![
+        store.personal[0]
+            .instance(Point::new(5., 5.), 1., 0.)
+            .unwrap(),
+    ];
     let map = temp.path().join("placed.mloom");
     formats::save(&map, &project, &store.assets).unwrap();
     store.personal.clear();
@@ -386,7 +391,7 @@ fn exported_prefabs_are_discovered_in_normal_asset_catalogs() {
         &images,
         &prefabs,
     )
-        .unwrap();
+    .unwrap();
     let directory = maploom::catalog::directory(temp.path(), None).unwrap();
     let catalog = maploom::catalog::scan(&directory);
     assert!(catalog.warnings.is_empty(), "{:?}", catalog.warnings);

@@ -246,8 +246,8 @@ pub fn dd_defaults(pck: &Path) -> Result<IndexedPack> {
             "caves/",
             "borders/",
         ]
-            .iter()
-            .any(|category| name.starts_with(&format!("res://textures/{category}")))
+        .iter()
+        .any(|category| name.starts_with(&format!("res://textures/{category}")))
             || !name.ends_with(".import")
         {
             continue;
@@ -350,9 +350,9 @@ pub fn category(meta: &AssetMeta) -> &'static str {
             .split('/')
             .any(|part| part.eq_ignore_ascii_case(category))
             || meta
-            .tags
-            .iter()
-            .any(|tag| tag.eq_ignore_ascii_case(category))
+                .tags
+                .iter()
+                .any(|tag| tag.eq_ignore_ascii_case(category))
     };
     // Materials are terrain paint and borders. Floors have their own tileset/pattern categories.
     if in_category("materials") {
@@ -551,9 +551,9 @@ fn dd_tag_json(bytes: &[u8]) -> Vec<u8> {
             normalized.push(byte);
         } else if byte != b','
             || !bytes[index + 1..]
-            .iter()
-            .find(|b| !b.is_ascii_whitespace())
-            .is_some_and(|b| matches!(b, b']' | b'}'))
+                .iter()
+                .find(|b| !b.is_ascii_whitespace())
+                .is_some_and(|b| matches!(b, b']' | b'}'))
         {
             normalized.push(byte);
         }
@@ -927,7 +927,7 @@ pub fn index_pck(path: &Path) -> Result<IndexedPack> {
                     offset: *offset,
                     size: *size,
                 }
-                    .read()?,
+                .read()?,
             )
         })();
         match logo {
@@ -1080,7 +1080,7 @@ fn save_collection(
         } else {
             "maploom/fabric"
         }
-            .into(),
+        .into(),
         version: 1,
         id: id(),
         name: name.into(),

@@ -177,7 +177,7 @@ pub fn texture_ids(ctx: &egui::Context) -> std::collections::HashSet<egui::Textu
         data.get_temp::<std::collections::HashSet<egui::TextureId>>(egui::Id::new(
             "scene-light-textures",
         ))
-            .unwrap_or_default()
+        .unwrap_or_default()
     })
 }
 
@@ -227,11 +227,7 @@ pub fn rasterize(smoothing: f32, intensity: f32, side: u32) -> RgbaImage {
             let edge =
                 (band + 1) as f32 / 5. * (1. - 0.12 * (1. - smoothing) * contour(angle, band));
             let coverage = if smoothing == 0. {
-                if radius < edge {
-                    1.
-                } else {
-                    0.
-                }
+                if radius < edge { 1. } else { 0. }
             } else {
                 smoothstep((edge - radius) / (0.22 * smoothing))
             };
@@ -305,7 +301,7 @@ pub fn draw(
         data.get_temp_mut_or_default::<std::collections::HashSet<egui::TextureId>>(egui::Id::new(
             "scene-light-textures",
         ))
-            .insert(texture.id());
+        .insert(texture.id());
     });
     if let Some(polygon) = visibility {
         let mut mesh = egui::Mesh::with_texture(texture.id());

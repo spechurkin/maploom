@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::Library,
     document::*,
@@ -316,7 +316,7 @@ fn native_exports_preserve_main_background_and_other_floor_transparency() {
             ..options(3)
         },
     )
-        .unwrap();
+    .unwrap();
     assert!(lit.get_pixel(128, 128)[0] > upper.get_pixel(128, 128)[0]);
 
     use maploom::assets::{self, Asset, Source};
@@ -353,7 +353,7 @@ fn native_exports_preserve_main_background_and_other_floor_transparency() {
                 color: [255; 4],
             },
         )
-            .with_texture(Some("tile"));
+        .with_texture(Some("tile"));
         item.tint = tint;
         item
     };

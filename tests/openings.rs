@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::{self, Asset, Library, Source},
     document::*,
@@ -17,7 +17,7 @@ fn portal(a: Point, b: Point) -> Item {
             color: [255; 4],
         },
     )
-        .with_texture(Some("portal"))
+    .with_texture(Some("portal"))
 }
 
 #[test]
@@ -103,7 +103,7 @@ fn fixture() -> (Project, Library) {
                     blocks_sight: true,
                 },
             )
-                .with_texture(Some("wall")),
+            .with_texture(Some("wall")),
         );
     }
     p.levels[0].layers[1].items.push(
@@ -115,7 +115,7 @@ fn fixture() -> (Project, Library) {
                 color: [255; 4],
             },
         )
-            .with_texture(Some("wall")),
+        .with_texture(Some("wall")),
     );
     for (a, b) in [
         (Point::new(4., 2.), Point::new(6., 2.)),
@@ -157,10 +157,10 @@ fn wall_covers(p: &Project, library: &Library, point: Point) -> bool {
         .find(|t| {
             t.width == 16
                 && image::load_from_memory(&STANDARD.decode(&t.data).unwrap())
-                .unwrap()
-                .to_rgba8()
-                .get_pixel(0, 0)[0]
-                == 50
+                    .unwrap()
+                    .to_rgba8()
+                    .get_pixel(0, 0)[0]
+                    == 50
         })
         .unwrap()
         .key;
@@ -232,8 +232,12 @@ fn svg_and_raster_exports_leave_transparent_portals_clear() {
         jpeg_quality: 90,
     };
     let svg = render::svg(&p, &library, options).unwrap();
-    assert!(svg.contains("translate(2 2) rotate(0) translate(0 -0.25)\"><rect x=\"0\" width=\"2\""));
-    assert!(svg.contains("translate(2 2) rotate(0) translate(0 -0.25)\"><rect x=\"4\" width=\"4\""));
+    assert!(
+        svg.contains("translate(2 2) rotate(0) translate(0 -0.25)\"><rect x=\"0\" width=\"2\"")
+    );
+    assert!(
+        svg.contains("translate(2 2) rotate(0) translate(0 -0.25)\"><rect x=\"4\" width=\"4\"")
+    );
     let (image, _) = render::rasterize(&p, &library, options).unwrap();
     for (x, y) in [(5., 2.), (10., 5.), (5., 10.), (5., 15.), (5., 22.)] {
         let pixel = image.get_pixel((x * 32.) as u32, (y * 32.) as u32).0;
@@ -306,9 +310,10 @@ fn curved_openings_remove_arc_meshes_and_raster_pixels_and_restore_after_deletio
     assert_eq!(vtt["portals"].as_array().unwrap().len(), 4);
     let los = maploom::formats::line_of_sight(&p.levels[0]);
     for point in &points {
-        assert!(!los
-            .iter()
-            .any(|line| render::segment_distance(*point, line[0], line[1]) < 0.02));
+        assert!(
+            !los.iter()
+                .any(|line| render::segment_distance(*point, line[0], line[1]) < 0.02)
+        );
     }
     p.levels[0].layers[2].items.clear();
     for point in points {

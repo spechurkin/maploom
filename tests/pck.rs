@@ -22,9 +22,9 @@ fn image_pack_version(path: &std::path::Path, entries: &[(&str, Vec<u8>)], versi
     let header_size = if version == 2 { 100 } else { 88 };
     let mut offset = header_size
         + entries
-        .iter()
-        .map(|(name, _)| 4 + name.len() + 32 + if version == 2 { 4 } else { 0 })
-        .sum::<usize>() as u64
+            .iter()
+            .map(|(name, _)| 4 + name.len() + 32 + if version == 2 { 4 } else { 0 })
+            .sum::<usize>() as u64
         - base;
     for (name, body) in entries {
         file.write_all(&(name.len() as u32).to_le_bytes()).unwrap();
@@ -201,7 +201,7 @@ fn pack_image_headers_preserve_natural_path_proportions_without_decoding_pixels(
                 color: [255; 4],
             },
         )
-            .with_texture(Some(&id));
+        .with_texture(Some(&id));
         item.texture_scale = 0.5 * pack.assets[0].meta.size.x / pack.assets[0].meta.size.y;
         // Twelve cells contain two full images, each retaining its 12:1 ratio.
         assert_eq!(maploom::paths::item_ribbon(&item).last().unwrap().uv.x, 2.);
@@ -311,7 +311,7 @@ fn legacy_pack_paths_repair_automatic_repeats_once_across_variations_and_roundtr
             color: [255; 4],
         },
     )
-        .with_texture(Some(id));
+    .with_texture(Some(id));
     path.texture_scale = 0.5;
     project.levels[0].layers[1].items.push(path.clone());
     project.add_variation("Copy".into()).unwrap();
@@ -366,7 +366,7 @@ fn local_pack_path_dimensions_match_decoded_images_and_render_at_natural_proport
     let pack = assets::index_pack(&std::path::PathBuf::from(
         std::env::var_os("MAPLOOM_PATH_PACK").unwrap(),
     ))
-        .unwrap();
+    .unwrap();
     let paths: Vec<_> = pack
         .assets
         .iter()
@@ -432,7 +432,7 @@ fn local_pack_path_dimensions_match_decoded_images_and_render_at_natural_proport
                     color: [255; 4],
                 },
             )
-                .with_texture(Some(&asset.meta.id));
+            .with_texture(Some(&asset.meta.id));
             path.texture_scale = scale;
             path.path_style = Some(maploom::paths::PathStyle {
                 smoothness: 1.,
@@ -461,12 +461,12 @@ fn local_pack_path_dimensions_match_decoded_images_and_render_at_natural_proport
             output.join("scene.json"),
             serde_json::to_vec(&scene).unwrap(),
         )
-            .unwrap();
+        .unwrap();
         std::fs::write(
             output.join("project.json"),
             serde_json::to_vec(&project).unwrap(),
         )
-            .unwrap();
+        .unwrap();
         let options = render::ExportOptions {
             level: 0,
             pixels_per_grid: 80,
@@ -480,7 +480,7 @@ fn local_pack_path_dimensions_match_decoded_images_and_render_at_natural_proport
             output.join("path-proportions.svg"),
             render::svg(&project, &library, options).unwrap(),
         )
-            .unwrap();
+        .unwrap();
         maploom::formats::save(&output.join("path-proportions.mloom"), &project, &library).unwrap();
         eprintln!(
             "{}: size {:?}, repeat {} cells",
@@ -568,9 +568,9 @@ fn pack_tag_metadata_accepts_godot_trailing_commas_without_changing_strings() {
         ];
         let header_size = 88
             + entries
-            .iter()
-            .map(|(name, _)| 4 + name.len() + 32)
-            .sum::<usize>();
+                .iter()
+                .map(|(name, _)| 4 + name.len() + 32)
+                .sum::<usize>();
         let mut file = std::fs::File::create(&path).unwrap();
         file.write_all(b"GDPC").unwrap();
         for value in [1u32, 3, 4, 2] {

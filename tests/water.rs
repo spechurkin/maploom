@@ -100,7 +100,7 @@ fn water_saves_reopens_undoes_and_exports_without_external_assets() {
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     assert!(svg.contains("data:image/png;base64,"));
     p.levels[0].layers[0].items[0]
         .water
@@ -144,10 +144,11 @@ fn gpu_scene_uploads_water_once_and_updates_it_after_material_changes() {
     let cold = renderer
         .scene(&p, &Library::new(), options(0), &HashSet::new())
         .unwrap();
-    assert!(cold
-        .textures
-        .iter()
-        .any(|t| t.width > 600 && t.height > 600));
+    assert!(
+        cold.textures
+            .iter()
+            .any(|t| t.width > 600 && t.height > 600)
+    );
     let known = cold.used_textures.iter().cloned().collect();
     let warm = renderer
         .scene(&p, &Library::new(), options(1), &known)

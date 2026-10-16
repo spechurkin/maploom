@@ -15,7 +15,7 @@ fn portal(texture: &str, closed: bool) -> Item {
             color: [255; 4],
         },
     )
-        .with_texture(Some(texture))
+    .with_texture(Some(texture))
 }
 
 fn export(items: Vec<Item>, library: &Library) -> serde_json::Value {
@@ -142,7 +142,7 @@ fn manual_window_type_survives_native_project_save_load_and_file_export() {
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     let vtt: serde_json::Value = serde_json::from_slice(&std::fs::read(output).unwrap()).unwrap();
     assert_eq!(vtt["portals"][0]["closed"], false);
     assert_eq!(vtt["portals"][1]["closed"], true);
@@ -195,7 +195,7 @@ fn window_tags_are_used_even_with_opaque_asset_names() {
         std::slice::from_mut(&mut asset),
         br#"{"tags":{"[Pack] Windows":["textures/portals/abc123.png"]}}"#,
     )
-        .unwrap();
+    .unwrap();
     assert_eq!(asset.meta.portal_type(), PortalType::Window);
     library.insert(asset.meta.id.clone(), asset.clone());
     let item = portal(&asset.meta.id, true);

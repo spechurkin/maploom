@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use maploom::{
     assets::{self, Asset, Library, Source},
     document::*,
@@ -74,8 +74,8 @@ fn oversized_texture_uploads_preserve_aspect_and_detail_in_both_orientations() {
                 [20, 210, 70, 255]
             })
         })
-            .write_to(&mut bytes, image::ImageFormat::Png)
-            .unwrap();
+        .write_to(&mut bytes, image::ImageFormat::Png)
+        .unwrap();
         a.meta.size = Point::new(width as f32 / 256., height as f32 / 256.);
         a.meta.sha256 = assets::hash(bytes.get_ref());
         a.source = Source::Bytes(Arc::new(bytes.into_inner()));
@@ -93,7 +93,7 @@ fn oversized_texture_uploads_preserve_aspect_and_detail_in_both_orientations() {
                     color: [255; 4],
                 },
             )
-                .with_texture(Some("large")),
+            .with_texture(Some("large")),
         );
         let mut renderer = SceneRenderer::default();
         let scene = renderer
@@ -174,7 +174,7 @@ fn terrain_stays_below_floors_and_rooms_without_water_or_caves_in_gpu_and_svg() 
                         color: [255; 4],
                     },
                 )
-                    .with_texture(Some("land")),
+                .with_texture(Some("land")),
             );
             let mut opts = options(0);
             opts.grid = false;
@@ -215,7 +215,7 @@ fn terrain_stays_below_floors_and_rooms_without_water_or_caves_in_gpu_and_svg() 
                     jpeg_quality: 90,
                 },
             )
-                .unwrap();
+            .unwrap();
             let colors: Vec<_> = svg
                 .split("data:image/png;base64,")
                 .skip(1)
@@ -268,7 +268,7 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
                 color: [255; 4],
             },
         )
-            .with_texture(Some("floor")),
+        .with_texture(Some("floor")),
     );
     p.levels[0].layers[2].items.push(
         Item::new(
@@ -278,7 +278,7 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
                 color: [255; 4],
             },
         )
-            .with_texture(Some("land")),
+        .with_texture(Some("land")),
     );
     let scene = SceneRenderer::default()
         .scene(&p, &library, options(0), &HashSet::new())
@@ -295,9 +295,9 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
         .find(|t| {
             t.width == 16
                 && STANDARD.decode(&t.data).is_ok_and(|bytes| {
-                image::load_from_memory(&bytes)
-                    .is_ok_and(|im| im.to_rgba8().get_pixel(0, 0)[0] == 140)
-            })
+                    image::load_from_memory(&bytes)
+                        .is_ok_and(|im| im.to_rgba8().get_pixel(0, 0)[0] == 140)
+                })
         })
         .unwrap()
         .key;
@@ -312,9 +312,11 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
         .position(|m| &m.texture == water_key)
         .unwrap();
     assert!(first_land < first_water);
-    assert!(scene.meshes[first_water + 1..]
-        .iter()
-        .any(|m| m.texture != *water_key));
+    assert!(
+        scene.meshes[first_water + 1..]
+            .iter()
+            .any(|m| m.texture != *water_key)
+    );
     let svg = maploom::render::svg(
         &p,
         &library,
@@ -326,7 +328,7 @@ fn water_stays_above_all_terrain_layers_and_below_architecture_in_gpu_and_svg() 
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     let water_position = svg.find("<image x=").unwrap();
     assert!(svg[..water_position].contains("patternUnits=\"userSpaceOnUse\""));
     assert!(svg[water_position..].contains("patternUnits=\"userSpaceOnUse\""));
@@ -369,10 +371,12 @@ fn unchanged_meshes_are_referenced_and_a_reload_recovers_their_data() {
     let mut next = options(1);
     next.known_meshes = mesh_keys.clone();
     let repeated = renderer.scene(&project, &library, next, &known).unwrap();
-    assert!(repeated
-        .meshes
-        .iter()
-        .all(|m| m.vertices.is_empty() && m.indices.is_empty()));
+    assert!(
+        repeated
+            .meshes
+            .iter()
+            .all(|m| m.vertices.is_empty() && m.indices.is_empty())
+    );
     project.levels[0].layers[1].items[0].floor_tint = [30, 80, 150, 255];
     let mut next = options(2);
     next.known_meshes = mesh_keys;
@@ -383,10 +387,12 @@ fn unchanged_meshes_are_referenced_and_a_reload_recovers_their_data() {
     let reloaded = renderer
         .scene(&project, &library, options(2), &HashSet::new())
         .unwrap();
-    assert!(reloaded
-        .meshes
-        .iter()
-        .all(|m| !m.vertices.is_empty() && !m.indices.is_empty()));
+    assert!(
+        reloaded
+            .meshes
+            .iter()
+            .all(|m| !m.vertices.is_empty() && !m.indices.is_empty())
+    );
     assert_eq!(reloaded.stats.decoded_images, 0);
     assert_eq!(
         colored.meshes.iter().map(|m| &m.key).collect::<Vec<_>>(),
@@ -522,12 +528,16 @@ fn terrain_tiles_are_opaque_but_borders_keep_their_coverage() {
             assets::decode(&bytes).unwrap()
         })
         .collect();
-    assert!(images
-        .iter()
-        .any(|i| i.pixels().all(|p| p.0 == [20, 40, 60, 255])));
-    assert!(images
-        .iter()
-        .any(|i| i.pixels().all(|p| p.0 == [80, 60, 40, 70])));
+    assert!(
+        images
+            .iter()
+            .any(|i| i.pixels().all(|p| p.0 == [20, 40, 60, 255]))
+    );
+    assert!(
+        images
+            .iter()
+            .any(|i| i.pixels().all(|p| p.0 == [80, 60, 40, 70]))
+    );
     let svg = maploom::render::svg(
         &p,
         &library,
@@ -539,7 +549,7 @@ fn terrain_tiles_are_opaque_but_borders_keep_their_coverage() {
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     let mut embedded = svg.split("data:image/png;base64,").skip(1).map(|s| {
         let bytes = STANDARD.decode(s.split('"').next().unwrap()).unwrap();
         assets::decode(&bytes).unwrap()
@@ -609,7 +619,7 @@ fn returning_to_a_terrain_material_keeps_paint_order_in_gpu_and_svg() {
             jpeg_quality: 90,
         },
     )
-        .unwrap();
+    .unwrap();
     assert_eq!(svg.matches("<pattern ").count(), 3);
     // A floor is painted after all terrain. Distinct owners keep separate meshes
     // even when their textures match, so pixel picking can distinguish them.

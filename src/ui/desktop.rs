@@ -11,16 +11,16 @@ use crate::{
     storage::prefabs::{self, Prefab, Store},
     storage::recovery,
 };
-use anyhow::{ensure, Context, Result};
-use base64::{engine::general_purpose::STANDARD, Engine};
+use anyhow::{Context, Result, ensure};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
     io::Cursor,
     path::PathBuf,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc, Mutex, OnceLock,
+        atomic::{AtomicBool, Ordering},
     },
 };
 use tauri::{Emitter, Manager};
@@ -129,11 +129,13 @@ mod startup_tests {
             .unwrap();
         assert!(editor.project_open);
         assert!(!editor.dirty());
-        assert!(editor
-            .project
-            .background_asset
-            .as_ref()
-            .is_some_and(|id| editor.library.contains_key(id)));
+        assert!(
+            editor
+                .project
+                .background_asset
+                .as_ref()
+                .is_some_and(|id| editor.library.contains_key(id))
+        );
         assert_eq!(editor.catalogs[0].library.len(), 1);
         editor.apply(Action::RefreshDirectories).unwrap();
         assert!(
@@ -479,16 +481,18 @@ mod prefab_tests {
             editor.project.levels[0].layers[1].locked = locked;
             editor.project.levels[0].layers[1].visible = locked;
             let before = editor.project.clone();
-            assert!(editor
-                .apply(Action::PlacePrefab {
-                    key: key.clone(),
-                    level: 0,
-                    layer: 1,
-                    position: Point::new(10., 10.),
-                    scale: 1.,
-                    rotation: 0.
-                })
-                .is_err());
+            assert!(
+                editor
+                    .apply(Action::PlacePrefab {
+                        key: key.clone(),
+                        level: 0,
+                        layer: 1,
+                        position: Point::new(10., 10.),
+                        scale: 1.,
+                        rotation: 0.
+                    })
+                    .is_err()
+            );
             assert_eq!(editor.project, before);
             assert!(!editor.history.can_undo());
             assert_eq!(editor.revision, 0);
@@ -1140,9 +1144,9 @@ impl Editor {
                 for prefab in &mut incoming {
                     if prefab.preview.is_none()
                         && prefab
-                        .items
-                        .iter()
-                        .any(|i| !matches!(i.kind, ItemKind::Object { .. }))
+                            .items
+                            .iter()
+                            .any(|i| !matches!(i.kind, ItemKind::Object { .. }))
                     {
                         prefabs::add_preview(prefab, &mut library)?;
                     }
@@ -1321,8 +1325,8 @@ impl Editor {
                 };
                 if !demo
                     && p.background_asset
-                    .as_ref()
-                    .is_some_and(|id| !self.library.contains_key(id))
+                        .as_ref()
+                        .is_some_and(|id| !self.library.contains_key(id))
                 {
                     p.background_asset = None;
                 }
@@ -1369,23 +1373,23 @@ impl Editor {
             Action::Save { save_as } => {
                 let path = if save_as
                     || self.path.as_ref().is_some_and(|p| {
-                    p.extension()
-                        .is_some_and(|e| e.eq_ignore_ascii_case("dungeondraft_map"))
-                }) {
+                        p.extension()
+                            .is_some_and(|e| e.eq_ignore_ascii_case("dungeondraft_map"))
+                    }) {
                     None
                 } else {
                     self.path.clone()
                 }
-                    .or_else(|| {
-                        rfd::FileDialog::new()
-                            .set_file_name(format!(
-                                "{}.mloom",
-                                self.project.name.replace(['/', '\\', ':'], "-")
-                            ))
-                            .add_filter("Maploom", &["mloom"])
-                            .save_file()
-                    })
-                    .context("Cancelled")?;
+                .or_else(|| {
+                    rfd::FileDialog::new()
+                        .set_file_name(format!(
+                            "{}.mloom",
+                            self.project.name.replace(['/', '\\', ':'], "-")
+                        ))
+                        .add_filter("Maploom", &["mloom"])
+                        .save_file()
+                })
+                .context("Cancelled")?;
                 formats::save(&path, &self.project, &self.resolved_library())?;
                 self.path = Some(path);
                 self.recovered = false;
@@ -1624,7 +1628,7 @@ impl Editor {
                 } else {
                     self.recovery.clone()
                 }
-                    .context("No recovery backup available")?;
+                .context("No recovery backup available")?;
                 self.confirm_replace()?;
                 let loaded = recovery::load(&backup.path)?;
                 self.load_catalogs()?;
@@ -1824,22 +1828,26 @@ mod catalog_tests {
         assert!(!editor.snapshot(false).project_open);
         assert!(!editor.dirty());
         assert!(editor.apply(Action::Save { save_as: false }).is_err());
-        assert!(editor
-            .apply(Action::ResizeMap {
-                top: 1,
-                right: 0,
-                bottom: 0,
-                left: 0
-            })
-            .is_err());
-        assert!(editor
-            .apply(Action::New {
-                name: "Bad".into(),
-                width: 0,
-                height: 10,
-                demo: false
-            })
-            .is_err());
+        assert!(
+            editor
+                .apply(Action::ResizeMap {
+                    top: 1,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                })
+                .is_err()
+        );
+        assert!(
+            editor
+                .apply(Action::New {
+                    name: "Bad".into(),
+                    width: 0,
+                    height: 10,
+                    demo: false
+                })
+                .is_err()
+        );
         assert!(!editor.project_open);
         editor
             .apply(Action::New {
@@ -1852,12 +1860,14 @@ mod catalog_tests {
         assert!(editor.snapshot(false).project_open);
         assert!(!editor.dirty());
         assert_eq!((editor.project.width, editor.project.height), (48, 27));
-        assert!(editor
-            .project
-            .levels
-            .iter()
-            .flat_map(|l| &l.layers)
-            .all(|l| l.items.is_empty()));
+        assert!(
+            editor
+                .project
+                .levels
+                .iter()
+                .flat_map(|l| &l.layers)
+                .all(|l| l.items.is_empty())
+        );
         editor.project.levels[0].layers[0].locked = true;
         let mut text = Item::new(
             "Locked",
@@ -1893,14 +1903,16 @@ mod catalog_tests {
         editor.apply(Action::Redo).unwrap();
         assert_eq!(editor.project, resized);
         let revision = editor.revision;
-        assert!(editor
-            .apply(Action::ResizeMap {
-                top: -512,
-                right: 0,
-                bottom: 0,
-                left: 0
-            })
-            .is_err());
+        assert!(
+            editor
+                .apply(Action::ResizeMap {
+                    top: -512,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                })
+                .is_err()
+        );
         assert_eq!(editor.project, resized);
         assert_eq!(editor.revision, revision);
         editor
@@ -2055,11 +2067,13 @@ mod catalog_tests {
             name: directory.name,
             packs: Some(vec![String::new()]),
         });
-        assert!(editor
-            .apply(Action::Commit {
-                project: Box::new(selected)
-            })
-            .unwrap());
+        assert!(
+            editor
+                .apply(Action::Commit {
+                    project: Box::new(selected)
+                })
+                .unwrap()
+        );
         assert_eq!(editor.library.len(), 1);
         assert!(editor.snapshot(false).catalogs.is_none());
         assert!(editor.apply(Action::Undo).unwrap());
@@ -2068,14 +2082,16 @@ mod catalog_tests {
         assert_eq!(editor.library.len(), 1);
 
         editor.saved = editor.project.clone();
-        assert!(editor
-            .apply(Action::New {
-                name: "Other".into(),
-                width: 8,
-                height: 8,
-                demo: false
-            })
-            .unwrap());
+        assert!(
+            editor
+                .apply(Action::New {
+                    name: "Other".into(),
+                    width: 8,
+                    height: 8,
+                    demo: false
+                })
+                .unwrap()
+        );
         assert!(editor.project.asset_catalogs.is_empty());
         assert!(editor.library.is_empty());
 
@@ -2090,11 +2106,13 @@ mod catalog_tests {
         editor.commit(selected).unwrap();
         assert_eq!(editor.library.len(), 1);
         editor.saved = editor.project.clone();
-        assert!(editor
-            .apply(Action::Open {
-                path: Some(path.to_string_lossy().into_owned())
-            })
-            .unwrap());
+        assert!(
+            editor
+                .apply(Action::Open {
+                    path: Some(path.to_string_lossy().into_owned())
+                })
+                .unwrap()
+        );
         assert!(editor.library.is_empty());
         assert!(editor.project.asset_catalogs.is_empty());
         assert!(!editor.dirty());
@@ -2113,8 +2131,8 @@ async fn editor_snapshot(
         let editor = state.0.lock().map_err(|e| e.to_string())?;
         Ok(editor.snapshot(true))
     })
-        .await
-        .map_err(|e| e.to_string())?
+    .await
+    .map_err(|e| e.to_string())?
 }
 #[tauri::command]
 async fn editor_action(
@@ -2133,9 +2151,9 @@ async fn editor_action(
         let library = e.apply(action)? || before_assets != e.project.assets;
         Ok(e.snapshot(library))
     })
-        .await
-        .map_err(|e| e.to_string())?
-        .map_err(|e| format!("{e:#}"))
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| format!("{e:#}"))
 }
 #[tauri::command]
 async fn editor_scene(
@@ -2170,8 +2188,8 @@ async fn editor_scene(
             )
             .map_err(|e| format!("{e:#}"))
     })
-        .await
-        .map_err(|e| e.to_string())?
+    .await
+    .map_err(|e| e.to_string())?
 }
 #[derive(Deserialize)]
 struct DrawingPreviewRequest {
@@ -2497,9 +2515,9 @@ async fn editor_drawing_preview(
                 &known_textures.unwrap_or_default().into_iter().collect(),
             )
     })
-        .await
-        .map_err(|e| e.to_string())?
-        .map_err(|e| format!("{e:#}"))
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| format!("{e:#}"))
 }
 
 #[derive(Deserialize)]
@@ -2688,7 +2706,7 @@ mod portal_preview_tests {
                     &editor.library.get(asset).unwrap().meta,
                     [255; 4],
                 )
-                    .unwrap();
+                .unwrap();
                 assert_eq!(item.kind, expected.kind);
                 assert_eq!(item.portal_type, expected.portal_type);
                 assert_eq!(item.wall_attachment, expected.wall_attachment);
@@ -2792,9 +2810,9 @@ async fn editor_portal_preview(
                 &known_textures.unwrap_or_default().into_iter().collect(),
             )
     })
-        .await
-        .map_err(|e| e.to_string())?
-        .map_err(|e| format!("{e:#}"))
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
@@ -2812,9 +2830,9 @@ async fn asset_silhouette(
             .context("Missing asset")?;
         Ok(assets::alpha_silhouette(&assets::decode_surface(&asset)?))
     })
-        .await
-        .map_err(|e| e.to_string())?
-        .map_err(|e| format!("{e:#}"))
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
@@ -2859,9 +2877,9 @@ async fn asset_thumbnail(
             STANDARD.encode(bytes.into_inner())
         ))
     })
-        .await
-        .map_err(|e| e.to_string())?
-        .map_err(|e| format!("{e:#}"))
+    .await
+    .map_err(|e| e.to_string())?
+    .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
