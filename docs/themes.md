@@ -8,8 +8,7 @@ Edit the files below, then click **Reload themes**.
 The example button copies three CSS-only templates, **Monokai** (dark), **GitHub** (light) and **Contour** (light),
 and a CSS + TSX package, **Atlas**, with two variants: **Atlas Dark** and **Atlas Light**.
 Monokai and GitHub use palettes adapted from the classic JetBrains color schemes. Each theme keeps its own light or dark
-colors,
-including its card preview. Templates are created only on request; existing files are never overwritten.
+colors, including its card preview. Templates are created only on request; existing files are never overwritten.
 Repeated creation uses new folders such as `Monokai 2` and `GitHub 2`.
 
 ```text
@@ -37,8 +36,7 @@ For a CSS-only theme:
 ```
 
 Change `name` and the file paths. Keep `format` and `api_version` unchanged.
-Add `"entry": "theme.tsx"` if the theme uses code. At least one of `stylesheet` or `entry` is required. Set `mode` to
-`"dark"` or `"light"` to declare the theme's type.
+Add `"entry": "theme.tsx"` if the theme uses code. At least one of `stylesheet` or `entry` is required. Set `mode` to `"dark"` or `"light"` to declare the theme's type.
 
 ### Multiple variants in one folder
 
@@ -52,24 +50,15 @@ Use `variants` to offer multiple cards that share the package's CSS, TSX, images
   "stylesheet": "style.css",
   "entry": "theme.tsx",
   "variants": [
-    {
-      "id": "dark",
-      "name": "Atlas Dark",
-      "mode": "dark"
-    },
-    {
-      "id": "light",
-      "name": "Atlas Light",
-      "mode": "light"
-    }
+    { "id": "dark", "name": "Atlas Dark", "mode": "dark" },
+    { "id": "light", "name": "Atlas Light", "mode": "light" }
   ]
 }
 ```
 
 Each variant has a unique, stable `id`, a display `name` and a required `mode` (`dark` or `light`).
 Maploom shows one card per variant and remembers the folder and variant separately.
-Selecting either card sets the logo, base palette, `data-theme-mode`, preview and `api.appearance.mode` to that
-variant's type.
+Selecting either card sets the logo, base palette, `data-theme-mode`, preview and `api.appearance.mode` to that variant's type.
 CSS can switch palettes using `[data-theme-mode="light"]`; TSX can use `api.appearance.mode`.
 The first variant is the default when an older saved selection has no variant. An unavailable variant falls back
 to the built-in appearance and is marked unavailable. Themes without `variants` retain their single card.

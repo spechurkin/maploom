@@ -4,8 +4,8 @@ use crate::{
     document::*,
     render::{self, SceneTextures, View},
 };
-use anyhow::{Context, Result, ensure};
-use base64::{Engine, engine::general_purpose::STANDARD};
+use anyhow::{ensure, Context, Result};
+use base64::{engine::general_purpose::STANDARD, Engine};
 use egui::{Color32, Pos2, Rect, TextureHandle, TextureId, Vec2};
 use serde::Serialize;
 use sha2::{Digest, Sha256};

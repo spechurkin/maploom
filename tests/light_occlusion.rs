@@ -1,4 +1,4 @@
-use base64::{Engine, engine::general_purpose::STANDARD};
+use base64::{engine::general_purpose::STANDARD, Engine};
 use maploom::{
     assets::{Asset, Library, Source},
     document::*,
@@ -150,12 +150,10 @@ fn object_shadows_start_at_the_artwork_in_gpu_raster_svg_and_vtt() {
     let vtt = maploom::formats::dd2vtt(&p, 0, 64, &[], &library);
     let edges: Vec<Vec<Point>> = serde_json::from_value(vtt["line_of_sight"].clone()).unwrap();
     assert_eq!(edges.len(), 4);
-    assert!(
-        edges
-            .iter()
-            .flatten()
-            .all(|v| (5.75..=6.25).contains(&v.x) && (4.5..=5.5).contains(&v.y))
-    );
+    assert!(edges
+        .iter()
+        .flatten()
+        .all(|v| (5.75..=6.25).contains(&v.x) && (4.5..=5.5).contains(&v.y)));
     let svg = render::svg(&p, &library, options).unwrap();
     let polygon = Blockers::new(&p, 0, &library)
         .visibility(origin, 8.)
@@ -395,11 +393,9 @@ fn objects_and_caves_clip_gpu_svg_raster_and_vtt_consistently() {
             &scene(&p, &mut renderer, if is_cave { 2 } else { 0 }),
             point(8., 5.)
         ));
-        assert!(
-            render::svg(&p, &library(), options)
-                .unwrap()
-                .contains("clipPathUnits=\"userSpaceOnUse\"><polygon")
-        );
+        assert!(render::svg(&p, &library(), options)
+            .unwrap()
+            .contains("clipPathUnits=\"userSpaceOnUse\"><polygon"));
         let (blocked, _) = render::rasterize(&p, &library(), options).unwrap();
         assert_eq!(blocked.get_pixel(8 * 24, 5 * 24).0, p.background);
         let vtt = maploom::formats::dd2vtt(&p, 0, 24, &[], &library());
@@ -732,11 +728,9 @@ fn gpu_and_svg_update_after_moving_deleting_and_retyping_blockers_and_allow_disa
         *shadows = false;
     }
     assert!(light_covers(&scene(&p, &mut renderer, 5), point(8., 5.)));
-    assert!(
-        !render::svg(&p, &library(), options)
-            .unwrap()
-            .contains("clipPathUnits=\"userSpaceOnUse\"><polygon")
-    );
+    assert!(!render::svg(&p, &library(), options)
+        .unwrap()
+        .contains("clipPathUnits=\"userSpaceOnUse\"><polygon"));
 }
 
 #[test]

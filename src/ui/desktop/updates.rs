@@ -2,11 +2,11 @@
 use super::DesktopState;
 use serde::Serialize;
 use std::sync::{
-    Mutex,
     atomic::{AtomicBool, Ordering},
+    Mutex,
 };
 use std::time::Duration;
-use tauri::{Manager, ipc::Channel};
+use tauri::{ipc::Channel, Manager};
 use tauri_plugin_updater::{Update, UpdaterExt};
 
 #[derive(Default)]
@@ -90,8 +90,8 @@ pub(super) async fn update_open_release() -> Result<(), String> {
         open::that("https://github.com/spechurkin/maploom/releases/latest")
             .map_err(|e| e.to_string())
     })
-    .await
-    .map_err(|e| e.to_string())?
+        .await
+        .map_err(|e| e.to_string())?
 }
 
 #[tauri::command]
@@ -156,6 +156,6 @@ pub(super) async fn update_install(
         update.install(bytes).map_err(|e| e.to_string())?;
         app.restart();
     })
-    .await
-    .map_err(|e| e.to_string())?
+        .await
+        .map_err(|e| e.to_string())?
 }

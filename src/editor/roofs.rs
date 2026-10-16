@@ -168,8 +168,8 @@ pub fn valid(points: &[Point], width: f32, kind: RoofType) -> bool {
                 crate::render::segment_distance(c, a, b),
                 crate::render::segment_distance(d, a, b),
             ]
-            .iter()
-            .any(|d| *d < 1e-5)
+                .iter()
+                .any(|d| *d < 1e-5)
             {
                 return false;
             }

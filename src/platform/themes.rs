@@ -206,11 +206,9 @@ impl Theme {
     fn with_variant(mut self, id: Option<&str>) -> Result<Self> {
         let variant = match id {
             Some(id) => Some(
-                self.manifest
-                    .variants
-                    .iter()
+                self.manifest.variants.iter()
                     .find(|variant| variant.id == id)
-                    .context("Theme variant unavailable")?,
+                    .context("Theme variant unavailable")?
             ),
             None => self.manifest.variants.first(),
         };
@@ -251,9 +249,7 @@ pub fn scan(root: &Path) -> Catalog {
                         catalog.themes.push(theme);
                     } else {
                         for variant in &theme.manifest.variants {
-                            catalog
-                                .themes
-                                .push(theme.clone().with_variant(Some(&variant.id))?);
+                            catalog.themes.push(theme.clone().with_variant(Some(&variant.id))?);
                         }
                     }
                 }

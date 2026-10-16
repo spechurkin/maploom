@@ -3,7 +3,7 @@ use crate::{
     assets::{self, Asset, Library},
     document::{self, Item, ItemKind, Point},
 };
-use anyhow::{Context, Result, ensure};
+use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashSet},
@@ -38,7 +38,7 @@ pub fn validate_instance(item: &Item) -> Result<()> {
         items: contents.items.clone(),
         preview: None,
     }
-    .validate()
+        .validate()
 }
 
 /// Expand only for rendering/hit testing. Stable scoped IDs isolate separate instances.
@@ -521,8 +521,8 @@ impl Store {
         let legacy = path.with_extension("mloom_fabric");
         let path = if !path.exists()
             && path
-                .file_name()
-                .is_some_and(|n| n == "prefabs.mloom_prefab")
+            .file_name()
+            .is_some_and(|n| n == "prefabs.mloom_prefab")
             && legacy.is_file()
         {
             legacy.as_path()

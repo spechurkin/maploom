@@ -57,16 +57,14 @@ fn types_partition_their_footprints_and_shade_each_slope() {
             })
             .sum();
         assert!((area - geometry::area(&g.outline).abs()).abs() < 0.001);
-        assert!(
-            g.facets
-                .iter()
-                .any(|f| f.brightness(true, 135., 0.3) < 0.85)
-        );
-        assert!(
-            g.facets
-                .iter()
-                .all(|f| f.brightness(false, 135., 0.3) == 1.)
-        );
+        assert!(g
+            .facets
+            .iter()
+            .any(|f| f.brightness(true, 135., 0.3) < 0.85));
+        assert!(g
+            .facets
+            .iter()
+            .all(|f| f.brightness(false, 135., 0.3) == 1.));
     }
     assert_eq!(roofs::build(&points(), 4., RoofType::Hip).hips.len(), 4);
     // A square hip roof reduces the ridge to a single apex, without losing triangles.

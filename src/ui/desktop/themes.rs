@@ -14,9 +14,9 @@ pub async fn theme_package(id: String, variant: Option<String>) -> Result<themes
     tauri::async_runtime::spawn_blocking(move || {
         themes::package_variant(&themes::directory()?, &id, variant.as_deref())
     })
-    .await
-    .map_err(|e| e.to_string())?
-    .map_err(|e| format!("{e:#}"))
+        .await
+        .map_err(|e| e.to_string())?
+        .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
@@ -24,9 +24,9 @@ pub async fn theme_preview(id: String) -> Result<String, String> {
     tauri::async_runtime::spawn_blocking(move || {
         themes::preview_stylesheet(&themes::directory()?, &id)
     })
-    .await
-    .map_err(|e| e.to_string())?
-    .map_err(|e| format!("{e:#}"))
+        .await
+        .map_err(|e| e.to_string())?
+        .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
@@ -41,9 +41,9 @@ pub async fn theme_open_directory() -> Result<(), String> {
         open::that(root)?;
         Ok(())
     })
-    .await
-    .map_err(|e| e.to_string())?
-    .map_err(|e| format!("{e:#}"))
+        .await
+        .map_err(|e| e.to_string())?
+        .map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]

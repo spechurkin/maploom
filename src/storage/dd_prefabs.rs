@@ -8,7 +8,7 @@ use crate::{
     paths::{PathStyle, Transition},
     storage::prefabs::{self, Prefab},
 };
-use anyhow::{Context, Result, ensure};
+use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{io::Cursor, path::Path, sync::Arc};
@@ -34,7 +34,7 @@ pub fn read(pck: &Path) -> Result<Vec<Definition>> {
                 offset,
                 size,
             }
-            .read()?;
+                .read()?;
             let name = Path::new(&path)
                 .file_stem()
                 .context("Missing prefab name")?
@@ -253,7 +253,7 @@ pub fn parse(definition: &Definition, library: &mut Library) -> Result<Prefab> {
                 color: [255; 4],
             },
         )
-        .with_texture(Some(WHITE));
+            .with_texture(Some(WHITE));
         item.tint = formats::dd_color(&shape["color"], [255; 4]);
         item.floor_outline = Some(false);
         let layer = number(shape, "layer", 100.) as i32;
@@ -275,7 +275,7 @@ pub fn parse(definition: &Definition, library: &mut Library) -> Result<Prefab> {
                     color: [255; 4],
                 },
             )
-            .with_texture(Some(BORDER));
+                .with_texture(Some(BORDER));
             outline.texture_scale = border.meta.size.x * scale(shape).x.abs();
             components.push((layer, 0, outline));
         }
@@ -313,7 +313,7 @@ pub fn parse(definition: &Definition, library: &mut Library) -> Result<Prefab> {
                 color: [255; 4],
             },
         )
-        .with_texture(Some(asset));
+            .with_texture(Some(asset));
         item.path_profile = Some(profile);
         item.texture_scale = width * meta.size.x / meta.size.y;
         item.path_style = Some(PathStyle {

@@ -42,10 +42,10 @@ impl PathProfile {
             && self.alpha.len() == count
             && count <= 10000
             && self
-                .widths
-                .iter()
-                .chain(&self.alpha)
-                .all(|v| v.is_finite() && (0.0..=1.).contains(v))
+            .widths
+            .iter()
+            .chain(&self.alpha)
+            .all(|v| v.is_finite() && (0.0..=1.).contains(v))
     }
 }
 

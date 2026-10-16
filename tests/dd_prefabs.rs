@@ -174,11 +174,9 @@ fn mloom_prefab_is_self_contained_and_roundtrips_mixed_geometry_and_previews() {
     assert_eq!(store.personal, prefabs);
     for (original, imported) in originals.iter().zip(&store.personal) {
         assert_eq!(original.items.len(), imported.items.len());
-        assert!(
-            store
-                .assets
-                .contains_key(imported.preview.as_deref().unwrap())
-        );
+        assert!(store
+            .assets
+            .contains_key(imported.preview.as_deref().unwrap()));
         let placed = imported.place(Point::new(20., 20.), 1.5, 0.4).unwrap();
         for (source, copy) in imported.items.iter().zip(&placed) {
             assert_eq!(source.path_profile, copy.path_profile);
@@ -208,12 +206,10 @@ fn raw_dd_import_requires_dependencies_and_never_silently_drops_unsupported_comp
     assert!(error.to_string().contains("Missing prefab asset"));
     let mut unsupported = definition;
     unsupported.data["lights"] = serde_json::json!([{"range": 1}]);
-    assert!(
-        dd_prefabs::parse(&unsupported, &mut library())
-            .unwrap_err()
-            .to_string()
-            .contains("Unsupported")
-    );
+    assert!(dd_prefabs::parse(&unsupported, &mut library())
+        .unwrap_err()
+        .to_string()
+        .contains("Unsupported"));
 }
 
 #[test]

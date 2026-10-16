@@ -1,5 +1,5 @@
 use crate::document::Point;
-use anyhow::{Result, ensure};
+use anyhow::{ensure, Result};
 use i_overlay::{
     core::{fill_rule::FillRule, overlay_rule::OverlayRule},
     float::single::SingleFloatOverlay,
@@ -152,8 +152,8 @@ pub fn valid_floor_cutouts(outer: &[Point], holes: &[Vec<Point>]) -> bool {
             crate::render::segment_distance(c, a, b),
             crate::render::segment_distance(d, a, b),
         ]
-        .iter()
-        .any(|n| *n < 1e-6)
+            .iter()
+            .any(|n| *n < 1e-6)
             || (cross(a, b, c) * cross(a, b, d) < 0. && cross(c, d, a) * cross(c, d, b) < 0.)
     };
     for (n, ring) in rings.iter().enumerate() {
@@ -193,7 +193,7 @@ pub fn valid_floor_cutouts(outer: &[Point], holes: &[Vec<Point>]) -> bool {
             }
             if n > 0
                 && (crate::render::contains_polygon(ring, other[0])
-                    || crate::render::contains_polygon(other, ring[0]))
+                || crate::render::contains_polygon(other, ring[0]))
             {
                 return false;
             }

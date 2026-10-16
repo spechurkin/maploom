@@ -48,7 +48,7 @@ pub fn rooms(level: &Level) -> Vec<Vec<Point>> {
             })
             .collect::<Vec<_>>(),
     )
-    .unwrap_or_default()
+        .unwrap_or_default()
 }
 
 pub fn footprint(item: &Item) -> Vec<Vec<Point>> {
@@ -251,5 +251,5 @@ pub fn room_cuts(level: &Level) -> Vec<Vec<Point>> {
             .map(footprint)
             .collect::<Vec<_>>(),
     )
-    .unwrap_or_default()
+        .unwrap_or_default()
 }

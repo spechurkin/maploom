@@ -1,5 +1,5 @@
 pub use super::variations::Variation;
-use anyhow::{Result, ensure};
+use anyhow::{ensure, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
@@ -64,7 +64,7 @@ pub enum PortalType {
     Window,
 }
 
-fn named_portal_type<'a>(values: impl IntoIterator<Item = &'a str>) -> Option<PortalType> {
+fn named_portal_type<'a>(values: impl IntoIterator<Item=&'a str>) -> Option<PortalType> {
     let mut window = false;
     for value in values {
         let value = value.to_lowercase();
@@ -75,8 +75,8 @@ fn named_portal_type<'a>(values: impl IntoIterator<Item = &'a str>) -> Option<Po
         // Real packs also use window1, BlueLinedLongWindow and TWindowNarrow.
         window |= value.contains("window")
             || value
-                .split(|c: char| !c.is_alphanumeric())
-                .any(|part| matches!(part, "окно" | "окна"));
+            .split(|c: char| !c.is_alphanumeric())
+            .any(|part| matches!(part, "окно" | "окна"));
     }
     window.then_some(PortalType::Window)
 }
@@ -967,16 +967,16 @@ impl Project {
             (14., 7., 6., 3.),
             (20., 10., 3., 7.),
         ]
-        .into_iter()
-        .map(|(x, y, w, h)| {
-            vec![vec![
-                Point::new(x, y),
-                Point::new(x + w, y),
-                Point::new(x + w, y + h),
-                Point::new(x, y + h),
-            ]]
-        })
-        .collect();
+            .into_iter()
+            .map(|(x, y, w, h)| {
+                vec![vec![
+                    Point::new(x, y),
+                    Point::new(x + w, y),
+                    Point::new(x + w, y + h),
+                    Point::new(x, y + h),
+                ]]
+            })
+            .collect();
         let mut room = Item::new(
             "Sanctuary rooms",
             ItemKind::Room {
@@ -1004,7 +1004,7 @@ impl Project {
                 color: [255; 4],
             },
         )
-        .with_texture(Some("res://textures/portals/door_06.png"));
+            .with_texture(Some("res://textures/portals/door_06.png"));
         door.wall_attachment = Some(WallAttachment {
             wall: room_id.clone(),
             segment,
@@ -1046,7 +1046,7 @@ impl Project {
                     color: [255; 4],
                 },
             )
-            .with_texture(Some(&texture));
+                .with_texture(Some(&texture));
             window.wall_attachment = Some(WallAttachment {
                 wall: room_id.clone(),
                 segment,
@@ -1076,14 +1076,14 @@ impl Project {
                     (4.1, 8.2),
                     (5., 8.),
                 ]
-                .into_iter()
-                .map(|(x, y)| Point::new(x, y))
-                .collect(),
+                    .into_iter()
+                    .map(|(x, y)| Point::new(x, y))
+                    .collect(),
                 width: 1.35,
                 color: [255; 4],
             },
         )
-        .with_texture(Some("res://textures/paths/path_blender_03.png"));
+            .with_texture(Some("res://textures/paths/path_blender_03.png"));
         approach.texture_scale = 4.;
         p.levels[0].layers[0].items.push(approach);
         // Rugs go below the furniture; the central aisle and connecting passages stay clear.

@@ -89,13 +89,11 @@ fn startup_selects_newest_project_and_falls_back_from_corrupt_archives() {
     );
     recovery::save(dir.path(), &b, &library).unwrap();
     fs::write(&recent, b"broken archive").unwrap();
-    assert!(
-        recovery::latest(dir.path(), Some(&b.id))
-            .unwrap()
-            .unwrap()
-            .path
-            .ends_with("Later-recovery-2.mloom")
-    );
+    assert!(recovery::latest(dir.path(), Some(&b.id))
+        .unwrap()
+        .unwrap()
+        .path
+        .ends_with("Later-recovery-2.mloom"));
     assert_eq!(
         recovery::latest(dir.path(), None).unwrap().unwrap().name,
         "Later"
@@ -127,11 +125,9 @@ fn startup_selects_newest_project_and_falls_back_from_corrupt_archives() {
         recovery::latest(dir.path(), None).unwrap().unwrap().path,
         old
     );
-    assert!(
-        recovery::latest(dir.path(), Some("missing"))
-            .unwrap()
-            .is_none()
-    );
+    assert!(recovery::latest(dir.path(), Some("missing"))
+        .unwrap()
+        .is_none());
 }
 
 #[test]
@@ -141,14 +137,12 @@ fn invalid_names_and_imported_ids_stay_inside_local_project_directory() {
     p.id = "../../outside".into();
     let path = recovery::save(dir.path(), &p, &Library::new()).unwrap();
     assert_eq!(path.parent().unwrap().parent().unwrap(), dir.path());
-    assert!(
-        !path
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .contains(['/', '\\', ':', '<', '>', '?', '*', '|'])
-    );
+    assert!(!path
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .contains(['/', '\\', ':', '<', '>', '?', '*', '|']));
     assert_eq!(formats::load(&path).unwrap().project, p);
 }
 

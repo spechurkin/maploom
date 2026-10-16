@@ -45,7 +45,7 @@ struct LocalFont {
 }
 static CATALOG: OnceLock<BTreeMap<String, LocalFont>> = OnceLock::new();
 
-fn font_name<'a>(names: impl IntoIterator<Item = ttf_parser::name::Name<'a>>) -> Option<String> {
+fn font_name<'a>(names: impl IntoIterator<Item=ttf_parser::name::Name<'a>>) -> Option<String> {
     // Custom fonts often retain a template name in the platform-0 records.
     // Prefer Windows English metadata, then other Windows / Unicode names.
     names
@@ -53,7 +53,11 @@ fn font_name<'a>(names: impl IntoIterator<Item = ttf_parser::name::Name<'a>>) ->
         .filter(|n| n.name_id == ttf_parser::name_id::FULL_NAME)
         .filter_map(|n| {
             let rank = if n.platform_id == ttf_parser::PlatformId::Windows {
-                if n.language_id == 0x0409 { 0 } else { 1 }
+                if n.language_id == 0x0409 {
+                    0
+                } else {
+                    1
+                }
             } else {
                 2
             };
@@ -81,9 +85,9 @@ fn scan(directory: &Path, fonts: &mut BTreeMap<String, LocalFont>) {
         }
         if !kind.is_file()
             || !path
-                .extension()
-                .and_then(|e| e.to_str())
-                .is_some_and(|e| ["ttf", "otf", "ttc", "otc"].contains(&e.to_lowercase().as_str()))
+            .extension()
+            .and_then(|e| e.to_str())
+            .is_some_and(|e| ["ttf", "otf", "ttc", "otc"].contains(&e.to_lowercase().as_str()))
         {
             continue;
         }
@@ -165,7 +169,7 @@ pub struct FontBook {
     attempted: BTreeSet<String>,
 }
 impl FontBook {
-    pub fn prepare<'a>(&mut self, ctx: &egui::Context, items: impl IntoIterator<Item = &'a Item>) {
+    pub fn prepare<'a>(&mut self, ctx: &egui::Context, items: impl IntoIterator<Item=&'a Item>) {
         let mut changed = false;
         for item in items {
             if !matches!(item.kind, ItemKind::Text { .. }) {
@@ -364,7 +368,7 @@ pub fn svg(item: &Item, ppg: f32) -> String {
             content.min / LAYOUT_SCALE + origin,
             content.max / LAYOUT_SCALE + origin,
         )
-        .expand(PADDING / ppg);
+            .expand(PADDING / ppg);
         let border = s.border_width / ppg;
         // SVG strokes are centered: offset half the border outward to preserve the 4 px inner gap.
         let rect = rect.expand(border / 2.);

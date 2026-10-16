@@ -1,6 +1,6 @@
 //! Variation scenes share map dimensions and assets, with independent content.
 use crate::document::*;
-use anyhow::{Context, Result, ensure};
+use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -19,7 +19,7 @@ pub struct Variation {
 
 impl Project {
     /// Visit every independent scene once; the active cache is deliberately skipped.
-    pub fn all_levels_mut(&mut self) -> impl Iterator<Item = &mut Level> {
+    pub fn all_levels_mut(&mut self) -> impl Iterator<Item=&mut Level> {
         let active = self.active_variation.as_deref();
         self.levels.iter_mut().chain(
             self.variations
