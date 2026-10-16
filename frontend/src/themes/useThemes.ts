@@ -3,8 +3,9 @@ import {convertFileSrc} from "@tauri-apps/api/core";
 import {invoke} from "../app/native";
 import {desktop} from "../app/bridge";
 import type {Preferences} from "../map/model";
-import {resolveThemeMode, type Appearance, type ThemeCatalog, type ThemeMode, type ThemePackage} from "./contract";
+import {resolveThemeMode, type Appearance, type Theme, type ThemeCatalog, type ThemeMode, type ThemePackage} from "./contract";
 import {activateTheme, type ThemeRuntime} from "./runtime";
+import {startupTheme, themeBranding} from "./branding";
 
 export function useThemes(preferences: Preferences | undefined, projectOpen: boolean) {
     const [catalog, setCatalog] = useState<ThemeCatalog>({directory: "", themes: [], warnings: []});
@@ -13,7 +14,8 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
         id: string;
         variant: string | null;
         generation: number;
-        mode?: ThemeMode | null
+        mode?: ThemeMode | null;
+        theme: Theme;
     } | null>(null);
     const [generation, setGeneration] = useState(0);
     const [working, setWorking] = useState(false);
@@ -24,9 +26,12 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
         locale: preferences?.locale ?? "en",
         screen: projectOpen ? "editor" : "welcome"
     };
-    const variant = preferences?.theme_variant ?? null;
-    const active = loaded?.id === preferences?.theme && loaded?.variant === variant && loaded?.generation === generation ? loaded : null;
-    const appearance: Appearance = {...baseAppearance, mode: resolveThemeMode(active?.mode, baseAppearance.mode)};
+    const id = preferences ? preferences.theme : startupTheme?.id;
+    const variant = preferences ? preferences.theme_variant ?? null : startupTheme?.variant ?? null;
+    const active = loaded?.id === id && loaded?.variant === variant && loaded?.generation === generation ? loaded : null;
+    const initialTheme = !error && generation === 0 && startupTheme && startupTheme.id === id &&
+        (startupTheme.variant ?? null) === (variant ?? startupTheme.manifest.variants?.[0]?.id ?? null) ? startupTheme : null;
+    const appearance: Appearance = {...baseAppearance, mode: resolveThemeMode(active?.mode ?? initialTheme?.manifest.mode, baseAppearance.mode)};
     const latest = useRef(baseAppearance);
     latest.current = baseAppearance;
     useEffect(() => {
@@ -42,10 +47,9 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
         };
     }, [generation]);
     useEffect(() => {
-        const id = preferences?.theme;
         setError("");
         setLoaded(null);
-        if (!desktop || !preferences || !id) return;
+        if (!desktop || !id) return;
         const controller = new AbortController();
         const root = document.querySelector<HTMLElement>('[data-theme-part="app"]');
         if (!root) return;
@@ -67,7 +71,7 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
             else {
                 runtime.current = instance;
                 instance.update(themeAppearance());
-                setLoaded({id, variant, generation, mode: bundle.theme.manifest.mode});
+                setLoaded({id, variant, generation, mode: bundle.theme.manifest.mode, theme: bundle.theme});
             }
         }).catch(failure => {
             if (!controller.signal.aborted) setError(String(failure));
@@ -81,7 +85,7 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
             runtime.current = null;
             setWorking(false);
         };
-    }, [preferences?.theme, variant, generation, !!preferences]);
+    }, [id, variant, generation]);
     useEffect(() => {
         runtime.current?.update(appearance);
     }, [appearance.mode, appearance.locale, appearance.screen, appearance.accent.join(",")]);
@@ -111,6 +115,7 @@ export function useThemes(preferences: Preferences | undefined, projectOpen: boo
         error,
         active: active?.id ?? "",
         mode: appearance.mode,
+        branding: themeBranding(active?.theme ?? initialTheme),
         working,
         generation,
         reload: () => setGeneration(n => n + 1),

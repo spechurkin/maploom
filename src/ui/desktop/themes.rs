@@ -2,6 +2,27 @@ use crate::platform::themes;
 use tauri::http::{Request, Response};
 
 #[tauri::command]
+pub async fn theme_window_title(
+    window: tauri::WebviewWindow,
+    id: Option<String>,
+    variant: Option<String>,
+) -> Result<(), String> {
+    let title = tauri::async_runtime::spawn_blocking(move || {
+        id.and_then(|id| {
+            themes::read_variant(&themes::directory().ok()?, &id, variant.as_deref()).ok()
+        })
+        .and_then(|theme| theme.manifest.branding)
+        .map_or_else(
+            || "Maploom · Map Studio".to_owned(),
+            |branding| branding.name,
+        )
+    })
+    .await
+    .map_err(|e| e.to_string())?;
+    window.set_title(&title).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub async fn theme_catalog() -> Result<themes::Catalog, String> {
     tauri::async_runtime::spawn_blocking(|| themes::directory().map(|root| themes::scan(&root)))
         .await

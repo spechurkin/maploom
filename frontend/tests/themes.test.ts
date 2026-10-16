@@ -5,7 +5,31 @@ import {readFileSync} from "node:fs";
 import {createElement, type ReactNode} from "react";
 import * as jsxRuntime from "react/jsx-runtime";
 import {renderToStaticMarkup} from "react-dom/server";
+import {ThemeBrand, themeBranding} from "../src/themes/branding";
 import type {Appearance, Theme} from "../src/themes/contract";
+
+test("branding resolves local artwork and renders an accessible name without markup injection", () => {
+    assert.equal(themeBranding(null), null);
+    const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+    Object.defineProperty(globalThis, "window", {configurable: true, value: {
+        __TAURI_INTERNALS__: {convertFileSrc: (_path: string, protocol: string) => `http://${protocol}.localhost/`}
+    }});
+    try {
+        const theme: Theme = {id: "БО [夜]", manifest: {
+            format: "maploom/theme", api_version: 1, name: "Night", description: "", stylesheet: "style.css", entry: null,
+            branding: {name: "Бесценный Опыт <test>", logo: "images/уроборос.svg"}
+        }};
+        const branding = themeBranding(theme)!;
+        assert.equal(branding.logo, `http://maploom-theme.localhost/${encodeURIComponent(theme.id)}/images/${encodeURIComponent("уроборос.svg")}`);
+        const html = renderToStaticMarkup(createElement(ThemeBrand, {branding}));
+        assert.match(html, /Бесценный Опыт &lt;test&gt;/);
+        assert.match(html, /alt=""/);
+        assert.doesNotMatch(html, /Maploom|<test>/);
+    } finally {
+        if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
+        else Reflect.deleteProperty(globalThis, "window");
+    }
+});
 import {
     assetURL,
     isThemeSelected,
@@ -72,7 +96,7 @@ test("settings render both cards from one Atlas folder and mark only the chosen 
         html = renderToStaticMarkup(createElement(ThemeSettings, {
             themes: {
                 catalog: {directory: "themes", themes, warnings: []}, error: "", active: "Atlas", mode: "light",
-                working: false, generation: 0, reload() {
+                branding: null, working: false, generation: 0, reload() {
                 }, open: async () => {
                 }, example: async () => {
                 }

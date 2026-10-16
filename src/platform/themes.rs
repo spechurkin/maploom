@@ -25,6 +25,12 @@ pub struct Variant {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Branding {
+    pub name: String,
+    pub logo: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Manifest {
     pub format: String,
     pub api_version: u32,
@@ -39,6 +45,8 @@ pub struct Manifest {
     pub stylesheet: Option<String>,
     #[serde(default)]
     pub entry: Option<String>,
+    #[serde(default)]
+    pub branding: Option<Branding>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -175,6 +183,24 @@ pub fn read_theme(root: &Path, id: &str) -> Result<Theme> {
         "Theme needs a stylesheet or entry"
     );
     ensure!(manifest.variants.len() <= 32, "Too many theme variants");
+    if let Some(branding) = &manifest.branding {
+        ensure!(
+            !branding.name.trim().is_empty()
+                && branding.name.len() <= 128
+                && !branding.name.chars().any(char::is_control),
+            "Invalid theme brand name"
+        );
+        ensure!(
+            matches!(
+                Path::new(&branding.logo)
+                    .extension()
+                    .and_then(|s| s.to_str()),
+                Some("svg" | "png" | "webp" | "jpg" | "jpeg")
+            ),
+            "Theme brand logo must be an image"
+        );
+        resolve(&folder, &branding.logo)?;
+    }
     let mut ids = std::collections::HashSet::new();
     for variant in &manifest.variants {
         ensure!(

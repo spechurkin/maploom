@@ -77,6 +77,8 @@ import {useUpdates} from "./useUpdates";
 import {UpdatesPanel} from "../panels/UpdatesPanel";
 import {useThemes} from "../themes/useThemes";
 import {ThemeSettings} from "../themes/ThemeSettings";
+import {ThemeBrand} from "../themes/branding";
+import {invoke} from "./native";
 import * as bridge from "./bridge";
 import {type Action} from "./bridge";
 import {TextEditor, type TextKind, type TextMode} from "../panels/TextEditor";
@@ -662,6 +664,13 @@ export function App() {
         [turns, setTurns] = useState(0);
     const t = translator(data?.preferences.locale ?? "en", data?.locales);
     const themes = useThemes(data?.preferences, !!data?.project_open);
+    useEffect(() => {
+        document.title = themes.branding?.name ?? "Maploom · Map Studio";
+        if (bridge.desktop && data) void invoke("theme_window_title", {
+            id: themes.branding ? data.preferences.theme : null,
+            variant: data?.preferences.theme_variant
+        }).catch(() => {});
+    }, [themes.branding?.name, data?.preferences.theme, data?.preferences.theme_variant]);
     const exportNeedsAlpha = exportAll || (!exportVariations && !!data && level !== mainLevelIndex(data.project));
     useEffect(() => {
         if (exportNeedsAlpha && exportFormat === "jpeg") setExportFormat("png");
@@ -1416,11 +1425,12 @@ export function App() {
         node.addEventListener("wheel", wheel, {passive: false});
         return () => node.removeEventListener("wheel", wheel);
     });
-    const dark = data ? themes.mode === "dark" : bridge.startupDark;
+    const dark = data || themes.branding ? themes.mode === "dark" : bridge.startupDark;
     if (!data || !project || !activeLevel || !activeLayer)
         return (
-            <div className={`loading-screen ${dark ? "dark" : "light"}`}>
-                <img src={dark ? logoDark : logo} alt="Maploom"/>
+            <div className={`loading-screen ${dark ? "dark" : "light"}`} data-theme-part="app"
+                 data-theme-api="1" data-theme-mode={dark ? "dark" : "light"}>
+                {themes.branding ? <ThemeBrand branding={themes.branding}/> : <img src={dark ? logoDark : logo} alt="Maploom"/>}
                 {error ? (
                     <>
                         <p>{error}</p>
@@ -2170,10 +2180,11 @@ export function App() {
             {data.project_open ? <>
                 <header className="topbar" data-theme-part="header">
                     <div className="wordmark">
-                        <img src={brand} alt=""/>
+                        {themes.branding ? <ThemeBrand branding={themes.branding}/> : <><img src={brand} alt=""/>
                         <span>
             maploom<span className="studio-label">STUDIO</span>
           </span>
+                        </>}
                     </div>
                     <div className="header-divider"/>
                     <div className="file-menu-wrap">
@@ -3890,7 +3901,7 @@ export function App() {
                     <button className="icon-button" aria-label={t("Close")} title={t("Close")}
                             onClick={() => setRecoveryDismissed(true)}><X size={18}/></button>
                 </section>}
-                <div className="welcome-brand"><img src={dark ? logoDark : logo} alt="Maploom"/></div>
+                <div className="welcome-brand">{themes.branding ? <ThemeBrand branding={themes.branding}/> : <img src={dark ? logoDark : logo} alt="Maploom"/>}</div>
                 <h1>{t("Welcome title")}</h1>
                 <p>{t("Welcome description")}</p>
                 <div className="welcome-actions">
@@ -4540,7 +4551,7 @@ export function App() {
                                         </>}
                                     </div> : <div className="modal-body" role="tabpanel" id="settings-panel-updates"
                                                   aria-labelledby="settings-tab-updates">
-                                        <UpdatesPanel updates={updates} t={t} dirty={data.dirty}
+                                        <UpdatesPanel updates={updates} t={t} dirty={data.dirty} appName={themes.branding?.name}
                                                       busy={busy > 0 || !!gesture.length || !!drag}
                                                       onInstall={async () => {
                                                           if (current.current?.dirty) {

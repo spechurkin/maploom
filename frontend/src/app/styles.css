@@ -125,6 +125,11 @@ input[type="color"] {
 }
 
 kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    vertical-align: middle;
     font-size: 10px;
     font-family: inherit;
     white-space: nowrap;
@@ -540,7 +545,7 @@ fieldset {
 
 .command-trigger kbd {
     border: 0;
-    padding: 1px 0 1px 8px;
+    padding: 1px 5px;
     font-size: 9px;
 }
 
@@ -3243,6 +3248,39 @@ fieldset {
     width: clamp(180px, 24vw, 280px);
     height: auto;
     max-height: 32vh;
+}
+
+.theme-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    font-family: Georgia, Cambria, serif;
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.2;
+}
+
+.theme-brand img {
+    width: clamp(100px, 14vw, 160px);
+    height: 160px;
+    max-height: 24vh;
+    object-fit: contain;
+}
+
+.wordmark:has(.theme-brand) {
+    width: auto;
+}
+
+.wordmark .theme-brand {
+    flex-direction: row;
+    gap: 8px;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.wordmark .theme-brand img {
+    width: 29px;
+    height: 29px;
 }
 
 .welcome-screen h1 {

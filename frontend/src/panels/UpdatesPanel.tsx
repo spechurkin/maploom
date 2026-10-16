@@ -4,6 +4,7 @@ import {desktop} from "../app/bridge";
 import type {useUpdates} from "../app/useUpdates";
 
 type Props = {
+    appName?: string;
     updates: ReturnType<typeof useUpdates>;
     t: (key: string) => string;
     dirty: boolean;
@@ -11,14 +12,14 @@ type Props = {
     onInstall: () => Promise<void>
 };
 
-export function UpdatesPanel({updates: u, t, dirty, busy, onInstall}: Props) {
+export function UpdatesPanel({updates: u, t, dirty, busy, onInstall, appName = "Maploom"}: Props) {
     const available = u.info?.status === "available";
     const retryInstall = !!u.error && u.failedAction === "install" && available;
     const title = u.checking ? "Update checking" : u.error ? retryInstall ? "Update install failed" : "Update check failed" : available ? "Update available title"
         : u.info?.status === "current" ? "Update current" : u.info?.status === "unpublished" ? "Update unavailable" : "Update stay current";
     const StatusIcon = u.checking ? LoaderCircle : u.error ? AlertCircle : available ? Download : u.info?.status === "current" ? CheckCheck : RefreshCw;
     return <section className="updates-panel" aria-live="polite">
-        <div className="update-app-version"><span>Maploom</span><span>{t("Version")} {version}</span></div>
+        <div className="update-app-version"><span>{appName}</span><span>{t("Version")} {version}</span></div>
         <div className={`update-status-card ${available && !u.error ? "has-update" : ""}`}>
             <span className={`update-status-icon ${u.checking ? "spin" : ""}`}><StatusIcon size={24}/></span>
             <div className="update-status-copy">

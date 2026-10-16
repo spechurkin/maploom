@@ -2893,10 +2893,31 @@ pub fn run(demo: bool, path: Option<PathBuf>) -> Result<()> {
     let close_allowed = Arc::new(AtomicBool::new(false));
     // Read only the small settings file before showing the window; the first
     // snapshot initializes the editor, and libraries load only when needed.
-    let dark = Preferences::load().dark;
+    let preferences = Preferences::load();
+    let startup_theme = preferences.theme.as_ref().and_then(|id| {
+        crate::platform::themes::read_variant(
+            &crate::platform::themes::directory().ok()?,
+            id,
+            preferences.theme_variant.as_deref(),
+        )
+        .ok()
+    });
+    let dark = startup_theme
+        .as_ref()
+        .and_then(|theme| theme.manifest.mode.as_ref())
+        .map_or(preferences.dark, |mode| {
+            *mode == crate::platform::themes::ThemeMode::Dark
+        });
+    let startup_theme_json = serde_json::to_string(&startup_theme)?;
     let shell_key = uuid::Uuid::new_v4().to_string();
     let mut context = tauri::generate_context!();
     for window in &mut context.config_mut().app.windows {
+        if let Some(branding) = startup_theme
+            .as_ref()
+            .and_then(|theme| theme.manifest.branding.as_ref())
+        {
+            window.title = branding.name.clone();
+        }
         window.background_color = Some(if dark {
             tauri::window::Color(16, 18, 24, 255)
         } else {
@@ -2908,7 +2929,7 @@ pub fn run(demo: bool, path: Option<PathBuf>) -> Result<()> {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(updates::UpdateState::default())
         .append_invoke_initialization_script(format!(
-            "if (window === window.top) {{ window.__MAPLOOM_DARK__ = {dark}; Object.defineProperty(window, '__MAPLOOM_INVOKE__', {{value: (command, payload) => window.__TAURI_INTERNALS__.invoke(command, payload, {{headers: {{'x-maploom-shell': '{shell_key}'}}}})}}); }}"
+            "if (window === window.top) {{ window.__MAPLOOM_DARK__ = {dark}; window.__MAPLOOM_THEME__ = {startup_theme_json}; Object.defineProperty(window, '__MAPLOOM_INVOKE__', {{value: (command, payload) => window.__TAURI_INTERNALS__.invoke(command, payload, {{headers: {{'x-maploom-shell': '{shell_key}'}}}})}}); }}"
         ))
         .setup(move |app| {
             crate::resources::set_bundle_directory(app.path().resource_dir()?);
@@ -2916,7 +2937,7 @@ pub fn run(demo: bool, path: Option<PathBuf>) -> Result<()> {
             Ok(())
         })
         .invoke_handler({
-            let handler: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![editor_snapshot,editor_action,editor_scene,editor_portal_preview,editor_drawing_preview,asset_thumbnail,asset_silhouette,editor_fonts,themes::theme_catalog,themes::theme_package,themes::theme_preview,themes::theme_open_directory,themes::theme_create_example,updates::update_check,updates::update_install,updates::update_open_release];
+            let handler: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![editor_snapshot,editor_action,editor_scene,editor_portal_preview,editor_drawing_preview,asset_thumbnail,asset_silhouette,editor_fonts,themes::theme_catalog,themes::theme_window_title,themes::theme_package,themes::theme_preview,themes::theme_open_directory,themes::theme_create_example,updates::update_check,updates::update_install,updates::update_open_release];
             move |invoke| {
                 if invoke.message.headers().get("x-maploom-shell").and_then(|value| value.to_str().ok()) != Some(shell_key.as_str()) {
                     invoke.resolver.reject("Editor commands are available only to the application shell");

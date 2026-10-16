@@ -1,6 +1,7 @@
 // Public theme API v1. Keep this independent of the editor model and bridge.
 export const themeTokens = ["--accent", "--accent-ink", "--bg", "--panel", "--panel-alt", "--input", "--text", "--muted", "--faint", "--line", "--hover", "--canvas", "--active", "--shadow", "--texture", "--theme-font"] as const;
 export type ThemeMode = "dark" | "light";
+export type ThemeBranding = { name: string; logo: string };
 export type ThemeVariant = { id: string; name: string; mode: ThemeMode };
 export type Appearance = Readonly<{
     mode: ThemeMode;
@@ -19,7 +20,8 @@ export type Theme = {
         mode?: ThemeMode | null;
         variants?: ThemeVariant[];
         stylesheet: string | null;
-        entry: string | null
+        entry: string | null;
+        branding?: ThemeBranding | null;
     }
 };
 export type ThemeCatalog = { directory: string; themes: Theme[]; warnings: string[] };

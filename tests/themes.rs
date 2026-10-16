@@ -66,6 +66,41 @@ fn unsupported_broken_and_missing_themes_do_not_prevent_other_themes_loading() {
 }
 
 #[test]
+fn branding_is_optional_shared_by_variants_and_confined_to_local_images() {
+    let root = tempfile::tempdir().unwrap();
+    let folder = theme(root.path(), "brand");
+    let mut manifest: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(folder.join("theme.json")).unwrap()).unwrap();
+    fs::write(folder.join("logo.svg"), "<svg/>").unwrap();
+    manifest["branding"] = serde_json::json!({"name": "Бесценный Опыт", "logo": "logo.svg"});
+    manifest["variants"] = serde_json::json!([
+        {"id": "night", "name": "Ночь", "mode": "dark"},
+        {"id": "paper", "name": "Пергамент", "mode": "light"}
+    ]);
+    fs::write(folder.join("theme.json"), manifest.to_string()).unwrap();
+    for variant in ["night", "paper"] {
+        let resolved = themes::read_variant(root.path(), "brand", Some(variant)).unwrap();
+        assert_eq!(resolved.manifest.branding.unwrap().name, "Бесценный Опыт");
+    }
+    for logo in [
+        "../logo.svg",
+        "https://example.com/logo.svg",
+        "missing.svg",
+        "style.css",
+    ] {
+        manifest["branding"]["logo"] = serde_json::json!(logo);
+        fs::write(folder.join("theme.json"), manifest.to_string()).unwrap();
+        assert!(themes::read_theme(root.path(), "brand").is_err(), "{logo}");
+    }
+    manifest["branding"]["logo"] = serde_json::json!("logo.svg");
+    for name in ["", "\n", "Bad\nname"] {
+        manifest["branding"]["name"] = serde_json::json!(name);
+        fs::write(folder.join("theme.json"), manifest.to_string()).unwrap();
+        assert!(themes::read_theme(root.path(), "brand").is_err());
+    }
+}
+
+#[test]
 fn theme_types_are_validated_and_legacy_themes_remain_adaptive() {
     let root = tempfile::tempdir().unwrap();
     let folder = theme(root.path(), "custom");
